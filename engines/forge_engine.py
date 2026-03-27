@@ -1044,6 +1044,11 @@ class ScaffoldGenerator:
         created.append(self._write(out / "qa" / "acceptance.md",
                                    self._render_acceptance(blueprint)))
 
+        # 8b. Quality gates (3-phase: concept → implementation → delivery)
+        gates_template = self._read_template("qa/gates.md")
+        if gates_template:
+            created.append(self._write(out / "qa" / "gates.md", gates_template))
+
         # 9. Spec dump (for reproducibility)
         created.append(self._write(
             out / "spec.json",
@@ -1051,7 +1056,269 @@ class ScaffoldGenerator:
                        default=str)
         ))
 
+        # 10. Agent team (derived from category + modules)
+        created.extend(self._generate_agent_team(out, blueprint))
+
         return created
+
+    # -----------------------------------------------------------------
+    # AGENT TEAM GENERATION
+    # -----------------------------------------------------------------
+
+    # Category → which agent roles are needed (beyond orchestrator + qa)
+    TEAM_MAP: Dict[str, List[Dict[str, str]]] = {
+        "website": [
+            {"name": "platform-lead", "domain": "Platform", "model": "opus",
+             "role": "lead", "routing": "(platform|arkitekt|design system|layout)"},
+            {"name": "ui-builder", "domain": "UI", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(component|page|section|ui|html|css|style)"},
+            {"name": "content-builder", "domain": "Content", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(content|text|copy|image|seo)"},
+            {"name": "deploy-agent", "domain": "Deploy", "model": "haiku",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(deploy|host|build|ci|cd)"},
+        ],
+        "web-app": [
+            {"name": "platform-lead", "domain": "Platform", "model": "opus",
+             "role": "lead", "routing": "(platform|arkitekt|system design)"},
+            {"name": "ui-builder", "domain": "UI/Frontend", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(component|page|ui|frontend|react|style)"},
+            {"name": "api-builder", "domain": "API/Backend", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(api|endpoint|route|backend|database|server)"},
+            {"name": "auth-builder", "domain": "Auth", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(auth|login|signup|session|permission)"},
+            {"name": "deploy-agent", "domain": "Deploy", "model": "haiku",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(deploy|host|build|ci|cd)"},
+        ],
+        "saas": [
+            {"name": "platform-lead", "domain": "Platform", "model": "opus",
+             "role": "lead", "routing": "(platform|arkitekt|system design)"},
+            {"name": "ui-builder", "domain": "UI/Frontend", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(component|page|ui|frontend|dashboard|react)"},
+            {"name": "api-builder", "domain": "API/Backend", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(api|endpoint|route|backend|database|server)"},
+            {"name": "auth-builder", "domain": "Auth", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(auth|login|signup|session|permission|billing)"},
+            {"name": "infra-agent", "domain": "Infrastructure", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(infra|docker|ci|cd|deploy|monitor|scale)"},
+        ],
+        "e-commerce": [
+            {"name": "platform-lead", "domain": "Platform", "model": "opus",
+             "role": "lead", "routing": "(platform|arkitekt|system design)"},
+            {"name": "ui-builder", "domain": "Storefront", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(component|page|product|cart|checkout|ui|style)"},
+            {"name": "api-builder", "domain": "Backend", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(api|endpoint|inventory|order|payment|backend)"},
+            {"name": "deploy-agent", "domain": "Deploy", "model": "haiku",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(deploy|host|build|ci|cd)"},
+        ],
+        "booking": [
+            {"name": "platform-lead", "domain": "Platform", "model": "opus",
+             "role": "lead", "routing": "(platform|arkitekt|system design)"},
+            {"name": "ui-builder", "domain": "UI/Booking", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(component|page|calendar|booking|form|ui|style)"},
+            {"name": "api-builder", "domain": "Backend", "model": "sonnet",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(api|endpoint|reservation|availability|backend)"},
+            {"name": "deploy-agent", "domain": "Deploy", "model": "haiku",
+             "role": "specialist", "parent": "platform-lead",
+             "routing": "(deploy|host|build|ci|cd)"},
+        ],
+        "tool": [
+            {"name": "code-lead", "domain": "Code", "model": "opus",
+             "role": "lead", "routing": "(code|arkitekt|design|module)"},
+            {"name": "builder", "domain": "Implementation", "model": "sonnet",
+             "role": "specialist", "parent": "code-lead",
+             "routing": "(build|implement|write|create|fix)"},
+            {"name": "test-writer", "domain": "Testing", "model": "sonnet",
+             "role": "specialist", "parent": "code-lead",
+             "routing": "(test|spec|assert|coverage|verify)"},
+        ],
+        "api": [
+            {"name": "code-lead", "domain": "API Architecture", "model": "opus",
+             "role": "lead", "routing": "(api|arkitekt|schema|design|endpoint)"},
+            {"name": "api-builder", "domain": "API Implementation", "model": "sonnet",
+             "role": "specialist", "parent": "code-lead",
+             "routing": "(build|implement|endpoint|route|handler)"},
+            {"name": "test-writer", "domain": "Testing", "model": "sonnet",
+             "role": "specialist", "parent": "code-lead",
+             "routing": "(test|spec|assert|coverage|verify)"},
+        ],
+    }
+
+    def _derive_team(self, blueprint: ProjectBlueprint) -> List[Dict[str, Any]]:
+        """Derive agent team from project category + modules."""
+        cat = blueprint.spec.category
+        cat_key = cat.value if hasattr(cat, "value") else str(cat)
+
+        # Base team: orchestrator + qa-lead (always present)
+        team = [
+            {"name": "orchestrator", "domain": "Coordination", "model": "opus",
+             "role": "orchestrator", "routing": "(priorit|plan|architect|coordinat|delegat)"},
+            {"name": "qa-lead", "domain": "Quality", "model": "sonnet",
+             "role": "reviewer", "routing": "(review|granska|quality|qa|test|validat)"},
+        ]
+
+        # Category-specific agents
+        category_agents = self.TEAM_MAP.get(cat_key, self.TEAM_MAP.get("web-app", []))
+        team.extend(category_agents)
+
+        # Module-driven additions
+        spec = blueprint.spec
+        if spec.has_auth and not any(a["name"] == "auth-builder" for a in team):
+            lead = next((a["name"] for a in team if a["role"] == "lead"), "orchestrator")
+            team.append({"name": "auth-builder", "domain": "Auth", "model": "sonnet",
+                         "role": "specialist", "parent": lead,
+                         "routing": "(auth|login|signup|session|permission)"})
+
+        if spec.has_payment and not any("payment" in a.get("routing", "") for a in team):
+            lead = next((a["name"] for a in team if a["role"] == "lead"), "orchestrator")
+            team.append({"name": "payment-builder", "domain": "Payment", "model": "sonnet",
+                         "role": "specialist", "parent": lead,
+                         "routing": "(payment|checkout|stripe|billing)"})
+
+        return team
+
+    def _generate_agent_team(self, out: Path, blueprint: ProjectBlueprint) -> List[str]:
+        """Generate agents/ directory with manifest + agent definition files."""
+        agents_dir = out / "agents"
+        agents_dir.mkdir(exist_ok=True)
+        created = []
+
+        team = self._derive_team(blueprint)
+        project_name = self._spec_display_name(blueprint.spec)
+
+        # Read vault agent templates
+        vault_root = self._repo_root() / "vault" / "agents"
+
+        # Generate agent manifest
+        manifest = {
+            "project": project_name,
+            "generated": datetime.now().isoformat(),
+            "category": blueprint.spec.category.value
+            if hasattr(blueprint.spec.category, "value")
+            else str(blueprint.spec.category),
+            "agents": []
+        }
+
+        lead_names = [a["name"] for a in team if a["role"] == "lead"]
+        specialist_names = [a["name"] for a in team if a["role"] == "specialist"]
+
+        for agent in team:
+            role = agent["role"]
+            name = agent["name"]
+            domain = agent["domain"]
+            model = agent.get("model", "sonnet")
+            routing = agent.get("routing", "")
+            parent = agent.get("parent", "orchestrator")
+
+            # Read the matching vault template
+            template_path = vault_root / f"{role}.md"
+            if template_path.is_file():
+                content = template_path.read_text(encoding="utf-8")
+            else:
+                # Fallback: generate minimal agent definition
+                content = self._minimal_agent_def(name, domain, model, role, routing, parent)
+
+            # Fill placeholders
+            content = content.replace("{{DOMAIN}}", domain)
+            content = content.replace("{{DOMAIN_TITLE}}", f"{domain} Architecture")
+            content = content.replace("{{SPECIALIST_NAME}}", name)
+            content = content.replace("{{SPECIALIST_TITLE}}", domain)
+            content = content.replace("{{PARENT_LEAD}}", parent)
+            content = content.replace("{{ROUTING_PATTERNS}}", routing)
+            content = content.replace("{{LEAD_AGENTS}}", ", ".join(lead_names))
+            content = content.replace("{{SPECIALIST_AGENTS}}", ", ".join(
+                [s["name"] for s in team if s.get("parent") == name]))
+            content = content.replace("{{BUILDER_LEAD}}", lead_names[0] if lead_names else "orchestrator")
+            content = content.replace("{{QA_LEAD}}", "qa-lead")
+            content = content.replace("{{DEPLOY_AGENT}}",
+                                      next((a["name"] for a in team if "deploy" in a["name"]), lead_names[0] if lead_names else "orchestrator"))
+
+            # Overwrite the name in frontmatter
+            if content.startswith("---"):
+                lines = content.split("\n")
+                for i, line in enumerate(lines[1:], 1):
+                    if line.startswith("name:"):
+                        lines[i] = f'name: "{name}"'
+                        break
+                    if line == "---":
+                        break
+                content = "\n".join(lines)
+
+            created.append(self._write(agents_dir / f"{name}.md", content))
+
+            # Add to manifest
+            manifest["agents"].append({
+                "name": name,
+                "role": role,
+                "domain": domain,
+                "model": model,
+                "routing_patterns": [routing] if routing else [],
+                "reports_to": parent if role == "specialist" else
+                              ("orchestrator" if role == "lead" else None),
+            })
+
+        # Write manifest
+        created.append(self._write(
+            agents_dir / "agent-manifest.json",
+            json.dumps(manifest, indent=2, ensure_ascii=False)
+        ))
+
+        return created
+
+    def _minimal_agent_def(self, name: str, domain: str, model: str,
+                           role: str, routing: str, parent: str) -> str:
+        """Fallback minimal agent definition when no vault template exists."""
+        tools_by_role = {
+            "orchestrator": "Read, Edit, Write, Bash, Glob, Grep, WebSearch, WebFetch, Agent",
+            "lead": "Read, Edit, Write, Bash, Glob, Grep, Agent, WebSearch",
+            "specialist": "Read, Edit, Write, Bash, Glob, Grep",
+            "reviewer": "Read, Glob, Grep, Bash",
+        }
+        return f"""---
+name: "{name}"
+role: {role}
+model: {model}
+allowedTools: [{tools_by_role.get(role, tools_by_role["specialist"])}]
+routing:
+  patterns: ["{routing}"]
+  fallback_to: "{parent}"
+coordination:
+  reports_to: "{parent}"
+---
+
+# {domain} — {role.title()}
+
+## Identity
+You are the {domain} {role} for this project.
+
+## Responsibilities
+- Execute {domain.lower()} tasks to production quality
+- Follow project constraints (SYSTEM.md)
+- Report completion to {parent}
+
+## Constraints
+- Follow SYSTEM.md code standards
+- Report files created/modified
+
+## Error Handling
+Escalation: {name} → {parent} → orchestrator → human.
+"""
 
     def _write(self, path: Path, content: str) -> str:
         path.write_text(content, encoding="utf-8")

@@ -3,7 +3,7 @@
 Quick reference for all available building blocks.
 Each item is self-contained and project-agnostic.
 
-## Skills (32)
+## Skills (33)
 
 | File | Domain |
 |------|--------|
@@ -26,6 +26,7 @@ Each item is self-contained and project-agnostic.
 | `file-upload` | Upload flow, type validation, storage |
 | `form-validation` | User input, forms |
 | `i18n` | Multi-language support |
+| `logging-observability` | Structured logging, correlation IDs, health checks |
 | `input-sanitization` | Sanitize user input before storage or display |
 | `modal-dialog` | Focus trap, keyboard nav, scroll lock |
 | `notification-system` | Toast/snackbar: timing, types, accessibility |
@@ -40,7 +41,7 @@ Each item is self-contained and project-agnostic.
 | `state-design` | Where state lives |
 | `testing-strategy` | What and how to test |
 
-## Constraints (15)
+## Constraints (16)
 
 | File | Prohibits |
 |------|-----------|
@@ -48,6 +49,7 @@ Each item is self-contained and project-agnostic.
 | `code-hygiene` | Commented-out code, unused imports/vars |
 | `dependency-discipline` | Unjustified npm packages |
 | `no-console-log` | console.log in production code |
+| `no-empty-catch` | Empty or silent catch/except blocks |
 | `no-direct-db-in-ui` | Database calls from client-side components |
 | `no-hardcoded-values` | Magic numbers, inline colors, hardcoded strings |
 | `no-implicit-any` | TypeScript `any` without annotation + comment |
@@ -77,20 +79,23 @@ Each item is self-contained and project-agnostic.
 | `when-to-abstract` | Concrete vs generic |
 | `when-to-cache` | When caching adds value vs complexity |
 
-## Routines (10)
+## Routines (13)
 
 | File | Trigger |
 |------|---------|
 | `accessibility-audit` | After any UI module |
+| `api-endpoint-check` | After implementing any API endpoint |
 | `code-complete` | Before marking code unit as done |
+| `database-migration-check` | Before running any database migration |
 | `dependency-audit` | When adding or updating packages |
 | `performance-check` | After any deployment |
-| `post-module-qa` | After every module |
+| `post-module-qa` | After every module (all types) |
 | `pre-commit` | Before any git commit |
-| `pre-deploy` | Before production deployment |
+| `pre-deploy` | Before any production deployment |
 | `responsive-verify` | After any visual change |
 | `retrospective` | After every phase/wave |
 | `security-check` | Before exposing any endpoint to the internet |
+| `wave-handoff` | Before ending session mid-wave, or at wave completion |
 
 ## Memories (16)
 
@@ -112,3 +117,12 @@ Each item is self-contained and project-agnostic.
 | `stack/react-vite` | React + Vite projects |
 | `stack/static-html` | Static HTML sites |
 | `stack/typescript-memories` | TypeScript-specific patterns |
+
+## Agent Templates (4)
+
+| File | Role | Model |
+|------|------|-------|
+| `agents/orchestrator` | Apex coordinator — delegates, never codes | opus |
+| `agents/lead` | Domain lead — owns architecture, delegates to specialists | opus |
+| `agents/specialist` | Focused implementer — executes specs from lead | sonnet |
+| `agents/reviewer` | QA gatekeeper — skeptical review, pass/fail verdicts | sonnet |
