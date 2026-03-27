@@ -1,0 +1,13 @@
+{
+  "id": "pipeline-composer",
+  "name": "Pipeline Composer",
+  "type": ["tool"],
+  "role": ["orchestrator", "planner"],
+  "domain": ["context-engineering", "dev"],
+  "mode": ["offline"],
+  "source": "tools/pipeline-composer/",
+  "entrypoints": ["tools/pipeline-composer/index.html"],
+  "tags": ["pipeline", "orchestration", "stages", "gates", "execution-flow", "dependencies"],
+  "status": "stable",
+  "verification": "self-tested"
+}

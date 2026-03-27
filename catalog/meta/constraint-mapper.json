@@ -1,0 +1,13 @@
+{
+  "id": "constraint-mapper",
+  "name": "Constraint Mapper",
+  "type": ["tool"],
+  "role": ["planner", "evaluator"],
+  "domain": ["context-engineering", "dev"],
+  "mode": ["offline"],
+  "source": "tools/constraint-mapper/",
+  "entrypoints": ["tools/constraint-mapper/index.html"],
+  "tags": ["constraints", "goals", "synonymity", "acceptance-criteria", "decomposition"],
+  "status": "stable",
+  "verification": "self-tested"
+}

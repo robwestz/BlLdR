@@ -1,0 +1,13 @@
+{
+  "id": "agent-rules",
+  "name": "agent-rules",
+  "type": ["rules", "pack"],
+  "role": ["rules-knowledge"],
+  "domain": ["context-engineering"],
+  "mode": ["offline"],
+  "source": "https://github.com/steipete/agent-rules",
+  "entrypoints": ["README.md", "docs/", "global-rules/", "project-rules/"],
+  "tags": ["rules", "knowledge"],
+  "status": "draft",
+  "verification": "unverified"
+}

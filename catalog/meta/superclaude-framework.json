@@ -1,0 +1,13 @@
+{
+  "id": "superclaude-framework",
+  "name": "SuperClaude_Framework",
+  "type": ["rules", "pack"],
+  "role": ["rules-knowledge"],
+  "domain": ["context-engineering"],
+  "mode": ["offline"],
+  "source": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+  "entrypoints": ["README.md", "docs/"],
+  "tags": ["personas", "methodology"],
+  "status": "draft",
+  "verification": "unverified"
+}

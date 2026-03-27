@@ -1,0 +1,20 @@
+# Source of truth for wave status and budgets. RUN.md drives how this is updated.
+version: 1
+contract_version: 1
+onboarding_complete: false
+phase: "build"
+loc_budget: 10000
+loc_consumed: 0
+file_touch_budget: null
+evaluation_mode: advisory
+last_evaluation_summary: ""
+waves:
+  "001-foundation":
+    status: pending
+    module_order: 1
+    module_id: "foundation"
+    module_file: "01-foundation.md"
+decisions: []
+derivations: []
+vault_selections: {}
+backlog: []

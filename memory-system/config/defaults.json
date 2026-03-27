@@ -1,0 +1,18 @@
+{
+  "security": {
+    "engine_whitelist": [
+      "claude",
+      "gemini",
+      "codex",
+      "sonnet"
+    ],
+    "deny_write_if_secret_like": true
+  },
+  "context_injection": {
+    "marker_start": "<!-- BUILDR-INJECT-START -->",
+    "marker_end": "<!-- BUILDR-INJECT-END -->"
+  },
+  "identity": {
+    "topic_weights": {}
+  }
+}

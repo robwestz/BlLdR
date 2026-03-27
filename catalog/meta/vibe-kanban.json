@@ -1,0 +1,13 @@
+{
+  "id": "vibe-kanban",
+  "name": "vibe-kanban",
+  "type": ["ui"],
+  "role": ["gui-shell"],
+  "domain": ["dev"],
+  "mode": ["offline"],
+  "source": "https://github.com/BloopAI/vibe-kanban",
+  "entrypoints": ["README.md"],
+  "tags": ["kanban", "review"],
+  "status": "draft",
+  "verification": "unverified"
+}

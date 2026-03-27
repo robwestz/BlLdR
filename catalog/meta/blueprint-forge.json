@@ -1,0 +1,13 @@
+{
+  "id": "blueprint-forge",
+  "name": "Blueprint Forge",
+  "type": ["tool"],
+  "role": ["planner", "builder", "orchestrator"],
+  "domain": ["context-engineering", "dev"],
+  "mode": ["offline"],
+  "source": "tools/blueprint-forge/",
+  "entrypoints": ["tools/blueprint-forge/index.html"],
+  "tags": ["templates", "blueprints", "code-generation", "agents", "prompts", "skills", "documents", "pack-builder"],
+  "status": "stable",
+  "verification": "self-tested"
+}

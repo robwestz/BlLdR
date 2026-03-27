@@ -1,0 +1,13 @@
+{
+  "id": "pal-mcp-server",
+  "name": "pal-mcp-server",
+  "type": ["runtime", "tool"],
+  "role": ["mcp-server"],
+  "domain": ["dev"],
+  "mode": ["api-optional"],
+  "source": "https://github.com/BeehiveInnovations/pal-mcp-server",
+  "entrypoints": ["README.md", "docs/"],
+  "tags": ["mcp", "multi-model"],
+  "status": "draft",
+  "verification": "unverified"
+}

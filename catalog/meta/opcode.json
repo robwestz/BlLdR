@@ -1,0 +1,13 @@
+{
+  "id": "opcode",
+  "name": "opcode",
+  "type": ["ui"],
+  "role": ["gui-shell"],
+  "domain": ["dev"],
+  "mode": ["offline"],
+  "source": "https://github.com/winfunc/opcode",
+  "entrypoints": ["README.md", "cc_agents/"],
+  "tags": ["desktop", "agents"],
+  "status": "draft",
+  "verification": "unverified"
+}

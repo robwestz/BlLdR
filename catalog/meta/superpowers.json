@@ -1,0 +1,13 @@
+{
+  "id": "superpowers",
+  "name": "superpowers",
+  "type": ["skill", "pack"],
+  "role": ["skills-pack"],
+  "domain": ["dev"],
+  "mode": ["offline"],
+  "source": "https://github.com/obra/superpowers",
+  "entrypoints": ["README.md", "skills/", "agents/"],
+  "tags": ["workflow", "agent-methodology"],
+  "status": "draft",
+  "verification": "unverified"
+}

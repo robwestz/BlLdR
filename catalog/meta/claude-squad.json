@@ -1,0 +1,13 @@
+{
+  "id": "claude-squad",
+  "name": "claude-squad",
+  "type": ["tool", "ui"],
+  "role": ["session-manager"],
+  "domain": ["dev"],
+  "mode": ["offline"],
+  "source": "https://github.com/smtg-ai/claude-squad",
+  "entrypoints": ["README.md", "ui/", "cmd/"],
+  "tags": ["tmux", "multi-agent"],
+  "status": "draft",
+  "verification": "unverified"
+}

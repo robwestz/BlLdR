@@ -1,0 +1,13 @@
+{
+  "id": "retrospective-builder",
+  "name": "Retrospective Builder",
+  "type": ["tool"],
+  "role": ["evaluator", "planner"],
+  "domain": ["context-engineering", "dev"],
+  "mode": ["offline"],
+  "source": "tools/retrospective-builder/",
+  "entrypoints": ["tools/retrospective-builder/index.html"],
+  "tags": ["retrospective", "post-mortem", "outcomes", "learning-loop", "improvement-actions"],
+  "status": "stable",
+  "verification": "self-tested"
+}

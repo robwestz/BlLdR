@@ -1,140 +1,4 @@
-# Buildr
-
-From a conversation to a complete, agent-built product.
-
-> **"95% of what makes an agent effective is project-agnostic."**
-> Buildr separates the reusable 95% from the project-specific 5%,
-> so any LLM agent can autonomously build any software project.
-
----
-
-## What This Is
-
-A system that takes a human project description and produces a self-contained
-workspace that any LLM agent can autonomously execute to build the project.
-
-The system combines six components:
-
-| Component | Purpose |
-|-----------|---------|
-| **Forge** | Onboarding + scaffold generation |
-| **Vault** | 100+ reusable, project-agnostic building blocks |
-| **Orchestration** | Wave-based execution with progressive disclosure |
-| **Imperfektum** | Fabricated agent memories that prevent common mistakes |
-| **Index** | Catalog of all tools and capabilities |
-| **Memory System** | Runtime discovery logging, context tiers, wave tracking |
-
-## Quick Start
-
-### Option A: Use with Claude Code / agent CLI
-
-```bash
-# Copy skills to your agent's skill directory
-cp -r skills/buildr-operator/ ~/.claude/skills/
-cp -r skills/buildr-executor/ ~/.claude/skills/
-cp -r skills/buildr-smith/ ~/.claude/skills/
-cp -r skills/buildr-scout/ ~/.claude/skills/
-
-# Tell your agent:
-# "I want to build a booking site for fishing trips in Zanzibar"
-# The operator skill handles the rest.
-```
-
-### Option B: Use the Python engines directly
-
-```bash
-cd engines/
-python bridge.py
-# Follow the prompts → workspace generated
-```
-
-### Option C: Point an agent at a generated workspace
-
-```bash
-# After generating a workspace:
-cd my-project-workspace/
-# Tell your agent: "Read WORKSPACE.md, then follow AGENT.md"
-```
-
-## Agent Skills
-
-| Skill | Role |
-|-------|------|
-| **buildr-operator** | Takes a human idea → produces a complete workspace |
-| **buildr-executor** | Executes a workspace wave by wave to completion |
-| **buildr-smith** | Creates and maintains Vault items (the building blocks) |
-| **buildr-scout** | Extracts knowledge from external sources → system improvements |
-
-## Directory Structure
-
-```text
-buildr/
-├── README.md                  ← You are here
-├── BUILDR_ARCHITECTURE.md     ← Full system design document
-├── MANIFEST.md                ← Complete system inventory
-│
-├── engines/                   ← Python runtime
-│   ├── forge_engine.py           Onboarding → scaffold
-│   ├── imperfektum_engine.py     Fabricated memory generation
-│   ├── vault_selector.py         Vault item selection per wave
-│   └── bridge.py                 Connects everything
-│
-├── skills/                    ← Agent skills (4)
-│   ├── buildr-operator/          "I want to build X" → workspace
-│   ├── buildr-executor/          Workspace → finished build
-│   ├── buildr-smith/             Create/maintain Vault items
-│   └── buildr-scout/             Knowledge extraction → system evolution
-│
-├── vault/                     ← Reusable building blocks
-│   ├── skills/                   How to do things (20+)
-│   ├── constraints/              What not to do (10+)
-│   ├── strategies/               How to think about decisions (8+)
-│   ├── routines/                 Verification checklists (6+)
-│   └── memories/                 Imperfektum templates (12+)
-│
-├── memory-system/             ← Runtime memory
-│   ├── tools/                    13 bash scripts (wave lifecycle, discoveries)
-│   ├── continuum/                Discovery log + sessions + checkpoints
-│   ├── context/                  Generated wave briefs
-│   └── config/                   Runtime defaults
-│
-├── catalog/                   ← The Index (tool catalog)
-│   ├── index.json
-│   └── meta/
-│
-├── templates/                 ← Orchestration kit
-│   ├── AGENT.md, CLAUDE.md       Agent protocols
-│   ├── EVALUATOR.md              Evaluator protocol
-│   ├── RUN.md, WORKSPACE.md      Execution templates
-│   ├── state/                    orchestration.yaml
-│   ├── waves/                    Wave templates
-│   └── contracts/                Interface contracts
-│
-├── tests/                     ← Python test suite
-├── docs/                      ← Plans, governance, proposals
-└── references/                ← Forge reference data
-```
-
-## Prerequisites
-
-- Python ≥ 3.10
-- An LLM agent (Claude Code, Codex, Gemini CLI, or any capable agent)
-- Bash (for memory-system tools)
-
-## How It Works
-
-1. You describe what you want to build (human language, no technical terms needed)
-2. The system derives all technical decisions (it never asks technical questions)
-3. It generates a workspace folder with everything the agent needs
-4. The agent reads the workspace and builds the project autonomously
-5. Each build phase uses relevant Vault items and fresh Imperfektum memories
-6. A builder/evaluator pattern prevents self-evaluation bias
-7. Quality gates after every module prevent cascading errors
-
----
-
-# System Architecture
-
+# BUILDR SYSTEM ARCHITECTURE
 ## Forge × Index × Imperfektum × Orchestration
 
 > This document defines the complete system and serves as the bootstrap
@@ -158,7 +22,6 @@ The system is designed so that:
 3. Work is sequenced in waves with progressive disclosure (Orchestration)
 4. Fabricated episodic memory steers agent behavior (Imperfektum)
 5. Everything is cataloged and retrievable (The Index)
-6. Generated workspaces use a builder/evaluator execution pattern by default
 
 ---
 
@@ -179,28 +42,67 @@ vault/
 │   ├── data-modeling.md    # How to design data models
 │   ├── error-handling.md   # How to implement error handling
 │   ├── testing-strategy.md # How to plan and write tests
+│   ├── performance.md      # How to optimize for performance
+│   ├── accessibility.md    # How to build accessible interfaces
+│   ├── responsive.md       # How to build responsive layouts
+│   ├── state-management.md # How to manage application state
+│   ├── form-validation.md  # How to validate user input
+│   ├── auth-patterns.md    # How to implement authentication
+│   ├── payment-flow.md     # How to implement payment flows
+│   ├── i18n.md             # How to internationalize
+│   ├── seo.md              # How to optimize for search engines
+│   ├── deploy.md           # How to deploy to production
 │   └── ...                 # (target: 30-40 skills)
 │
 ├── constraints/         # WHAT NOT to do
 │   ├── code-hygiene.md     # No console.log, no inline styles, etc.
+│   ├── token-budget.md     # Budget tracking rules
+│   ├── file-discipline.md  # File naming, structure, limits
+│   ├── dependency.md       # Minimize external deps, justify each
 │   ├── security.md         # Input sanitization, no secrets in code
+│   ├── accessibility.md    # WCAG AA minimum, semantic HTML
+│   ├── performance.md      # Bundle size limits, image optimization
 │   └── ...                 # (target: 15-20 constraints)
 │
 ├── strategies/          # HOW TO THINK about problems
 │   ├── decomposition.md    # Break large tasks into small steps
+│   ├── progressive-enhancement.md  # Build simple first, layer complexity
 │   ├── contract-first.md   # Define interfaces before implementation
+│   ├── mobile-first.md     # Design for smallest viewport first
+│   ├── error-first.md      # Handle errors before happy path
+│   ├── 30-70-rule.md       # Implement 30% that's hardest to design
 │   └── ...                 # (target: 10-15 strategies)
 │
 ├── routines/            # REPEATABLE PROCEDURES (like QA)
 │   ├── module-qa.md        # Post-module quality checklist
 │   ├── pre-deploy.md       # Pre-deployment verification
+│   ├── code-complete.md    # Definition of "done" for a code unit
+│   ├── ux-review.md        # UX quality verification
+│   ├── responsive-check.md # Responsive breakpoint verification
+│   ├── retrospective.md    # Post-phase retrospective template
 │   └── ...                 # (target: 10-15 routines)
+│
+├── contracts/           # INTERFACE TEMPLATES
+│   ├── api-contract.md     # REST API contract template
+│   ├── component-contract.md # UI component contract template
+│   ├── data-contract.md    # Data model contract template
+│   ├── integration-contract.md # Third-party integration template
+│   └── ...                 # (target: 5-10 templates)
 │
 └── memories/            # IMPERFEKTUM TEMPLATES
     ├── universal-scars.md  # Mistakes that apply to ALL projects
-    ├── universal-insights.md
-    ├── category/           # Per project type (booking, saas, etc.)
-    └── stack/              # Per technology (nextjs, python, etc.)
+    ├── universal-insights.md # Approaches that always work
+    ├── category/
+    │   ├── booking-scars.md
+    │   ├── ecommerce-scars.md
+    │   ├── webapp-scars.md
+    │   ├── saas-scars.md
+    │   └── ...
+    └── stack/
+        ├── nextjs-scars.md
+        ├── react-vite-scars.md
+        ├── python-scars.md
+        └── ...
 ```
 
 ### KEY PROPERTY: Every file in The Vault is COMPLETE and SELF-CONTAINED.
@@ -225,19 +127,6 @@ Based on the orchestration kit pattern. The orchestrator:
 5. Executes the wave
 6. Updates state
 7. Repeats
-
-### Default Execution Pattern: Builder + Evaluator
-
-Generated Buildr workspaces should not rely on a single agent silently
-self-evaluating its own output. The default pattern is:
-
-- **Builder** produces the current wave/module output
-- **Evaluator** reviews that output as a skeptical counterweight
-- **Builder** uses evaluator feedback as the default next input
-
-The evaluator is advisory by default, not automatically blocking, but it is
-part of the canonical execution loop and should be present in all generated
-workspaces.
 
 **Why this solves the N² context problem:**
 
@@ -341,6 +230,64 @@ class SystemOrchestrator:
 
 ---
 
+## The Bootstrap Problem — And Its Solution
+
+**Problem:** This system needs to be built. But it IS a system for building things.
+Can it build itself?
+
+**Yes.** Here's how:
+
+### Bootstrap Wave 0: The Vault Foundation
+
+An agent reads THIS DOCUMENT and creates the initial Vault structure.
+It writes the first 10-15 skills, 5-7 constraints, 3-5 strategies, and 3-5 routines.
+These are AGNOSTIC — they apply to building the system itself.
+
+**Imperfektum memory for Wave 0:**
+"Last time we built a reusable skill library, we made the mistake of writing
+skills that were too abstract. The skills that worked best were ones that
+contained specific, actionable instructions — 'validate on blur AND on submit'
+not 'implement appropriate validation.' Every skill should read like a
+checklist, not an essay."
+
+### Bootstrap Wave 1: The Orchestration Engine
+
+Using Wave 0's Vault, build the orchestration engine:
+- state/orchestration.yaml schema
+- Wave reader/executor
+- State updater
+- Vault selector (picks relevant items per wave)
+
+### Bootstrap Wave 2: Imperfektum Integration
+
+Using Waves 0-1, integrate Imperfektum:
+- Phase-specific memory generator
+- Wave-boundary memory injection
+- Memory templates in Vault
+
+### Bootstrap Wave 3: Forge Integration
+
+Using Waves 0-2, integrate Project Forge:
+- Onboarding → blueprint → wave plan
+- Category-specific Vault item selection
+- Design system derivation
+
+### Bootstrap Wave 4: Index Integration
+
+Using Waves 0-3, integrate The Index:
+- Catalog the Vault
+- Tool selection per wave
+- Pack builder for distribution
+
+### Bootstrap Wave 5: The Platform
+
+Using everything above, build the deployable system:
+- CLI entry point
+- Web interface (optional)
+- Distribution format
+
+---
+
 ## The Manufactured Déjà Vu Effect
 
 The deepest insight in this architecture:
@@ -368,6 +315,33 @@ project it's building — even though it's its first time.
 
 ---
 
-## License
+## Practical Next Steps
 
-Proprietary — buildr.nu
+### To build the minimum viable system:
+
+1. **Create The Vault** — 30 agnostic skills, 10 constraints, 5 strategies,
+   5 routines. Each is a standalone .md file.
+
+2. **Adapt the orchestration kit** — Use the uploaded SKILL.md pattern.
+   Create: CLAUDE.md, RUN.md, state schema, wave template.
+
+3. **Connect Imperfektum** — Generate phase-specific memories at wave
+   boundaries using Vault memories as templates + state as context.
+
+4. **Connect Forge** — Use onboarding to generate the project-specific 5%
+   (description, audience, feeling, design system).
+
+5. **Connect Index** — Catalog the Vault, enable tool/skill selection.
+
+### File count for MVP:
+- Vault: ~50 files (skills + constraints + strategies + routines)
+- Orchestration: 5 files (CLAUDE.md, RUN.md, state, onboarding, wave template)
+- Engines: 4 files (forge_engine.py, imperfektum_engine.py, bridge.py, vault_selector.py)
+- Total: ~60 files, most of them small .md documents
+
+This is not a large system. It's a small system with large leverage.
+
+---
+
+*This document is the seed. An agent reading it has everything needed
+to begin the bootstrap. The system builds itself.*

@@ -1,0 +1,13 @@
+{
+  "id": "ui-ux-pro-max-skill",
+  "name": "ui-ux-pro-max-skill",
+  "type": ["skill", "pack"],
+  "role": ["skills-pack"],
+  "domain": ["design-ui"],
+  "mode": ["offline"],
+  "source": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+  "entrypoints": ["README.md", ".claude/skills/ui-ux-pro-max/"],
+  "tags": ["ui", "design"],
+  "status": "draft",
+  "verification": "unverified"
+}

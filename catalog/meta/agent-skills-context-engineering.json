@@ -1,0 +1,13 @@
+{
+  "id": "agent-skills-context-engineering",
+  "name": "Agent-Skills-for-Context-Engineering",
+  "type": ["skill", "pack"],
+  "role": ["skills-pack"],
+  "domain": ["context-engineering"],
+  "mode": ["offline"],
+  "source": "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering",
+  "entrypoints": ["README.md", "SKILL.md", "skills/"],
+  "tags": ["context", "agent-systems"],
+  "status": "draft",
+  "verification": "unverified"
+}

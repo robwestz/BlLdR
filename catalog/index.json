@@ -1,0 +1,318 @@
+{
+  "generated_at": "2026-02-06T12:04:12.860687Z",
+  "count": 11,
+  "items": [
+    {
+      "id": "agent-rules",
+      "name": "agent-rules",
+      "type": [
+        "rules",
+        "pack"
+      ],
+      "role": [
+        "rules-knowledge"
+      ],
+      "domain": [
+        "context-engineering"
+      ],
+      "mode": [
+        "offline"
+      ],
+      "source": "https://github.com/steipete/agent-rules",
+      "entrypoints": [
+        "README.md",
+        "docs/",
+        "global-rules/",
+        "project-rules/"
+      ],
+      "tags": [
+        "rules",
+        "knowledge"
+      ],
+      "status": "draft",
+      "verification": "unverified"
+    },
+    {
+      "id": "agent-skills-context-engineering",
+      "name": "Agent-Skills-for-Context-Engineering",
+      "type": [
+        "skill",
+        "pack"
+      ],
+      "role": [
+        "skills-pack"
+      ],
+      "domain": [
+        "context-engineering"
+      ],
+      "mode": [
+        "offline"
+      ],
+      "source": "https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering",
+      "entrypoints": [
+        "README.md",
+        "SKILL.md",
+        "skills/"
+      ],
+      "tags": [
+        "context",
+        "agent-systems"
+      ],
+      "status": "draft",
+      "verification": "unverified"
+    },
+    {
+      "id": "claude-code-router",
+      "name": "claude-code-router",
+      "type": [
+        "runtime",
+        "tool"
+      ],
+      "role": [
+        "router-provider"
+      ],
+      "domain": [
+        "dev"
+      ],
+      "mode": [
+        "api-optional"
+      ],
+      "source": "https://github.com/musistudio/claude-code-router",
+      "entrypoints": [
+        "README.md",
+        "docs/"
+      ],
+      "tags": [
+        "router",
+        "multi-model"
+      ],
+      "status": "draft",
+      "verification": "unverified"
+    },
+    {
+      "id": "claude-flow",
+      "name": "claude-flow",
+      "type": [
+        "runtime",
+        "tool"
+      ],
+      "role": [
+        "orchestrator"
+      ],
+      "domain": [
+        "dev"
+      ],
+      "mode": [
+        "api-optional"
+      ],
+      "source": "https://github.com/ruvnet/claude-flow",
+      "entrypoints": [
+        "README.md",
+        "docs/"
+      ],
+      "tags": [
+        "orchestration",
+        "swarm",
+        "mcp"
+      ],
+      "status": "draft",
+      "verification": "unverified"
+    },
+    {
+      "id": "claude-squad",
+      "name": "claude-squad",
+      "type": [
+        "tool",
+        "ui"
+      ],
+      "role": [
+        "session-manager"
+      ],
+      "domain": [
+        "dev"
+      ],
+      "mode": [
+        "offline"
+      ],
+      "source": "https://github.com/smtg-ai/claude-squad",
+      "entrypoints": [
+        "README.md",
+        "ui/",
+        "cmd/"
+      ],
+      "tags": [
+        "tmux",
+        "multi-agent"
+      ],
+      "status": "draft",
+      "verification": "unverified"
+    },
+    {
+      "id": "opcode",
+      "name": "opcode",
+      "type": [
+        "ui"
+      ],
+      "role": [
+        "gui-shell"
+      ],
+      "domain": [
+        "dev"
+      ],
+      "mode": [
+        "offline"
+      ],
+      "source": "https://github.com/winfunc/opcode",
+      "entrypoints": [
+        "README.md",
+        "cc_agents/"
+      ],
+      "tags": [
+        "desktop",
+        "agents"
+      ],
+      "status": "draft",
+      "verification": "unverified"
+    },
+    {
+      "id": "pal-mcp-server",
+      "name": "pal-mcp-server",
+      "type": [
+        "runtime",
+        "tool"
+      ],
+      "role": [
+        "mcp-server"
+      ],
+      "domain": [
+        "dev"
+      ],
+      "mode": [
+        "api-optional"
+      ],
+      "source": "https://github.com/BeehiveInnovations/pal-mcp-server",
+      "entrypoints": [
+        "README.md",
+        "docs/"
+      ],
+      "tags": [
+        "mcp",
+        "multi-model"
+      ],
+      "status": "draft",
+      "verification": "unverified"
+    },
+    {
+      "id": "superclaude-framework",
+      "name": "SuperClaude_Framework",
+      "type": [
+        "rules",
+        "pack"
+      ],
+      "role": [
+        "rules-knowledge"
+      ],
+      "domain": [
+        "context-engineering"
+      ],
+      "mode": [
+        "offline"
+      ],
+      "source": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+      "entrypoints": [
+        "README.md",
+        "docs/"
+      ],
+      "tags": [
+        "personas",
+        "methodology"
+      ],
+      "status": "draft",
+      "verification": "unverified"
+    },
+    {
+      "id": "superpowers",
+      "name": "superpowers",
+      "type": [
+        "skill",
+        "pack"
+      ],
+      "role": [
+        "skills-pack"
+      ],
+      "domain": [
+        "dev"
+      ],
+      "mode": [
+        "offline"
+      ],
+      "source": "https://github.com/obra/superpowers",
+      "entrypoints": [
+        "README.md",
+        "skills/",
+        "agents/"
+      ],
+      "tags": [
+        "workflow",
+        "agent-methodology"
+      ],
+      "status": "draft",
+      "verification": "unverified"
+    },
+    {
+      "id": "ui-ux-pro-max-skill",
+      "name": "ui-ux-pro-max-skill",
+      "type": [
+        "skill",
+        "pack"
+      ],
+      "role": [
+        "skills-pack"
+      ],
+      "domain": [
+        "design-ui"
+      ],
+      "mode": [
+        "offline"
+      ],
+      "source": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "entrypoints": [
+        "README.md",
+        ".claude/skills/ui-ux-pro-max/"
+      ],
+      "tags": [
+        "ui",
+        "design"
+      ],
+      "status": "draft",
+      "verification": "unverified"
+    },
+    {
+      "id": "vibe-kanban",
+      "name": "vibe-kanban",
+      "type": [
+        "ui"
+      ],
+      "role": [
+        "gui-shell"
+      ],
+      "domain": [
+        "dev"
+      ],
+      "mode": [
+        "offline"
+      ],
+      "source": "https://github.com/BloopAI/vibe-kanban",
+      "entrypoints": [
+        "README.md"
+      ],
+      "tags": [
+        "kanban",
+        "review"
+      ],
+      "status": "draft",
+      "verification": "unverified"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,13 @@
+{
+  "id": "claude-flow",
+  "name": "claude-flow",
+  "type": ["runtime", "tool"],
+  "role": ["orchestrator"],
+  "domain": ["dev"],
+  "mode": ["api-optional"],
+  "source": "https://github.com/ruvnet/claude-flow",
+  "entrypoints": ["README.md", "docs/"],
+  "tags": ["orchestration", "swarm", "mcp"],
+  "status": "draft",
+  "verification": "unverified"
+}

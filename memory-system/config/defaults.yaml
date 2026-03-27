@@ -1,0 +1,2 @@
+# Reserved for future scalar defaults read via tools/_common.sh.
+# Current tools rely on defaults.json for active runtime settings.
