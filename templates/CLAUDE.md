@@ -1,13 +1,16 @@
 # Orchestration Agent Protocol
 
 ## Identity
-This workspace uses two default roles:
+This workspace uses role-based execution:
 
-- **Builder** — executes waves, implements modules, and updates state
-- **Evaluator** — reviews completed work, challenges weak output, and writes advisory feedback
+- **Orchestrator** — coordinates work, delegates to leads, never writes code directly
+- **Leads** — own their domain, delegate to specialists, review output
+- **Specialists** — implement specifications from leads to production quality
+- **Reviewer (QA Lead)** — reviews all completed work, issues PASS/FAIL verdicts
 
-The builder remains the primary execution role.
-The evaluator is the default critical counterweight and should be used after each completed wave or module.
+If an `agents/` directory exists, read `agents/agent-manifest.json` for the
+full team roster with roles, routing patterns, and coordination chains.
+If no `agents/` directory exists, a single agent fills all roles.
 
 ## Read Order
 1. WORKSPACE.md — project overview
@@ -15,26 +18,53 @@ The evaluator is the default critical counterweight and should be used after eac
 3. SYSTEM.md — design system, code standards
 4. MEMORY.md — your experience from building this before
 5. state/orchestration.yaml — current progress
-6. EVALUATOR.md — evaluator contract and review criteria
-7. The current wave file (one at a time, never all at once)
+6. agents/agent-manifest.json — team roster (if present)
+7. EVALUATOR.md — reviewer contract and evaluation criteria
+8. qa/gates.md — quality gate definitions (concept → implementation → delivery)
+9. The current wave file (one at a time, never all at once)
+
+## Rescue Projects
+If workspace files are in `.buildr/` (rescue project overlay):
+→ All paths are relative to `.buildr/`, not project root.
+→ Code changes target `../` (the actual project above .buildr/).
+→ Read `.buildr/diagnosis/issues.md` before starting any wave.
 
 ## Onboarding
 If `state/orchestration.yaml` has `onboarding_complete: false`:
 → Run `onboarding/prompt.md`, save answers to state, set `onboarding_complete: true`.
 
+## Quality Gates
+Three gates govern the project lifecycle (see `qa/gates.md` for checklists):
+
+- **Gate 1: CONCEPT** — after architecture decisions, before wave 001. All requirements unambiguous?
+- **Gate 2: IMPLEMENTATION** — after each wave. Exit criteria met? No regressions?
+- **Gate 3: DELIVERY** — after all waves. End-to-end verified? Acceptance criteria met?
+
+Gate failures are blocking: fix issues before proceeding.
+
 ## Running a Wave
-1. Builder reads state → finds first wave with `status != "complete"`
-2. Builder reads that wave file only
-3. Builder loads vault items listed in the wave
-4. Builder re-reads relevant MEMORY.md section for this wave
-5. Builder executes steps, updating state after each
-6. Evaluator reviews the resulting work and writes advisory feedback
-7. Builder addresses evaluator feedback or records why no change is needed
-8. Run QA (`qa/checklist.md` for this module)
-9. All QA checks PASS → mark wave complete in state
-10. Any QA check FAILS → fix, re-run QA, do not proceed until PASS
-11. Plan next wave if not pre-planned (organic planning)
-12. Proceed to next wave
+1. Read state → find first wave with `status != "complete"`
+2. Check `state.next_wave` field if present — it overrides file ordering
+3. Read that wave file only
+4. Load vault items listed in the wave (from `vault-selection/` if pre-selected)
+5. Re-read relevant MEMORY.md section for this wave
+6. Execute steps, updating state after each
+7. Reviewer evaluates the resulting work → writes to `qa/evaluations/`
+8. Address reviewer feedback or record why no change is needed
+9. Run Gate 2 checks (`qa/gates.md` Implementation checklist)
+10. All checks PASS → mark wave complete, set `next_wave` in state
+11. Any check FAILS → fix, re-run, do not proceed until PASS
+12. Plan next wave if not pre-planned (organic planning)
+13. Proceed to next wave
+
+## Agent Team Usage
+If `agents/agent-manifest.json` exists:
+- Orchestrator delegates wave execution to the appropriate lead
+- Lead delegates specific tasks to specialists
+- Reviewer (qa-lead) evaluates all output before wave close
+- Routing patterns in each agent definition indicate which tasks they handle
+
+If no agent manifest exists, a single agent performs all roles sequentially.
 
 ## Tier System
 - **Tier A** (architecture): Interfaces, contracts, security. Created first.
@@ -48,15 +78,17 @@ Do not browse the vault speculatively. Vault items are in `vault-selection/`.
 
 ## Evaluator Default
 
-Evaluator feedback is advisory by default, not a hard gate.
-However, the expected workflow is to treat evaluator feedback as the default next input before proceeding.
+Reviewer feedback is advisory by default, not a hard gate.
+However, the expected workflow is to treat reviewer feedback as the default
+next input before proceeding.
 
 For UI categories (`website`, `booking`, `e-commerce`, `web-app`, `saas`):
-- evaluator should use browser-based review by default when the tools are available
+- reviewer should use browser-based review by default when tools are available
 - prioritize design quality and originality alongside functionality
 
 For non-UI categories:
-- evaluator should prioritize contract fidelity, code quality, failure handling, and operational usability
+- reviewer should prioritize contract fidelity, code quality, failure handling,
+  and operational usability
 
 ## Imperfektum Protocol
 Before each wave, re-read the relevant section of MEMORY.md.
@@ -80,6 +112,7 @@ If context is lost (new session, compaction):
 1. Read this file (CLAUDE.md)
 2. Read MEMORY.md
 3. Read EVALUATOR.md
-4. Read state/orchestration.yaml
-5. Resume from first incomplete wave
+4. Read agents/agent-manifest.json (if present)
+5. Read state/orchestration.yaml
+6. Resume from first incomplete wave
 No conversation history needed. Everything is in state + files.

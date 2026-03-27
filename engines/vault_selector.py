@@ -113,6 +113,14 @@ SKILL_KEYWORDS: dict = {
     "performance": "performance.md",
     "optimize": "performance.md",
     "speed": "performance.md",
+    # --- Logging & observability ---
+    "logging": "logging-observability.md",
+    "observability": "logging-observability.md",
+    "monitoring": "logging-observability.md",
+    "log": "logging-observability.md",
+    "health check": "logging-observability.md",
+    "correlation": "logging-observability.md",
+    "tracing": "logging-observability.md",
 }
 
 TIER_CONSTRAINTS = {
@@ -121,40 +129,60 @@ TIER_CONSTRAINTS = {
         "code-hygiene.md", "dependency-discipline.md", "token-budget.md",
         "no-hardcoded-values.md", "security.md",
         "no-untyped-props.md", "no-direct-db-in-ui.md",
+        "no-empty-catch.md",
     ],
     # Feature: presentation layer + runtime safety
     "B": [
         "code-hygiene.md", "no-hardcoded-values.md", "no-inline-styles.md",
         "no-placeholder-content.md", "no-console-log.md",
         "no-magic-routes.md", "no-implicit-any.md",
+        "no-empty-catch.md",
     ],
     # Polish/integration: output quality + async safety
     "C": [
         "code-hygiene.md", "no-inline-styles.md", "no-console-log.md",
         "no-placeholder-content.md", "accessibility.md",
         "performance.md", "no-sync-in-async.md",
+        "no-empty-catch.md",
     ],
 }
 
 TIER_ROUTINES = {
-    # Foundation: verify structure, track dependencies, debrief
-    "A": ["post-module-qa.md", "retrospective.md", "dependency-audit.md", "pre-commit.md"],
-    # Feature: verify UI quality + security exposure
-    "B": ["post-module-qa.md", "responsive-verify.md", "pre-commit.md", "security-check.md"],
-    # Polish/integration: completeness + production readiness
-    "C": ["code-complete.md", "responsive-verify.md", "performance-check.md"],
+    # Foundation: verify structure, track dependencies, debrief, preserve handoff state
+    "A": [
+        "post-module-qa.md", "retrospective.md",
+        "dependency-audit.md", "pre-commit.md", "wave-handoff.md",
+    ],
+    # Feature: verify UI quality + security exposure + API contracts
+    "B": [
+        "post-module-qa.md", "responsive-verify.md",
+        "pre-commit.md", "security-check.md",
+        "api-endpoint-check.md", "wave-handoff.md",
+    ],
+    # Polish/integration: completeness + production readiness + migration safety
+    "C": [
+        "code-complete.md", "responsive-verify.md",
+        "performance-check.md", "pre-deploy.md",
+        "database-migration-check.md",
+    ],
 }
 
 
 def select_skills(intent: str) -> List[str]:
-    """Select vault skills matching the wave's intent."""
+    """Select vault skills matching the wave's intent.
+
+    SKILL_KEYWORDS values may be a single filename string or a list of
+    filenames (for keywords that naturally trigger multiple skills).
+    """
     intent_lower = intent.lower()
     selected = set()
-    for keyword, filename in SKILL_KEYWORDS.items():
+    for keyword, value in SKILL_KEYWORDS.items():
         if keyword in intent_lower:
-            path = VAULT_ROOT / "skills" / filename
-            if path.exists():
-                selected.add(str(path))
+            filenames = value if isinstance(value, list) else [value]
+            for filename in filenames:
+                path = VAULT_ROOT / "skills" / filename
+                if path.exists():
+                    selected.add(str(path))
     return sorted(selected)
 
 
@@ -174,20 +202,39 @@ def select_routines(tier: str) -> List[str]:
             for f in filenames if (VAULT_ROOT / "routines" / f).exists()]
 
 
+def _find_memory_file(sub: str, name: str) -> str | None:
+    """Locate a memory file by name, trying both naming conventions:
+    - Exact: vault/memories/{sub}/{name}.md
+    - Suffixed: vault/memories/{sub}/{name}-memories.md
+    Returns the resolved path string or None.
+    """
+    base = VAULT_ROOT / "memories" / sub
+    for candidate in (f"{name}.md", f"{name}-memories.md"):
+        path = base / candidate
+        if path.exists():
+            return str(path)
+    return None
+
+
 def select_memories(category: str = "", stack: str = "") -> List[str]:
-    """Select relevant Imperfektum memory templates."""
-    memories = [
-        str(VAULT_ROOT / "memories" / "universal-scars.md"),
-        str(VAULT_ROOT / "memories" / "universal-insights.md"),
-    ]
+    """Select relevant Imperfektum memory templates.
+
+    Supports both legacy naming ({name}.md) and current naming
+    ({name}-memories.md) so older and newer memory files are both found.
+    """
+    memories: List[str] = []
+    for universal in ("universal-scars.md", "universal-insights.md"):
+        path = VAULT_ROOT / "memories" / universal
+        if path.exists():
+            memories.append(str(path))
     if category:
-        cat_path = VAULT_ROOT / "memories" / "category" / f"{category}.md"
-        if cat_path.exists():
-            memories.append(str(cat_path))
+        found = _find_memory_file("category", category)
+        if found:
+            memories.append(found)
     if stack:
-        stack_path = VAULT_ROOT / "memories" / "stack" / f"{stack}.md"
-        if stack_path.exists():
-            memories.append(str(stack_path))
+        found = _find_memory_file("stack", stack)
+        if found:
+            memories.append(found)
     return memories
 
 

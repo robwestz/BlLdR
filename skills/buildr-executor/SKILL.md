@@ -42,13 +42,36 @@ the workspace.
 Read these files in exactly this order. Do not skip.
 
 ```
-1. WORKSPACE.md        → Structure overview. What exists, what the project is.
-2. AGENT.md            → Behavioral protocol. How this workspace expects you to act.
-3. state/orchestration.yaml → Current state. Which wave is active, what's done.
-4. MEMORY.md           → Fabricated history. Read as real; it steers your defaults.
-5. waves/[active-wave].md → Current wave spec. What to build now.
-6. contracts/[modules].md → Interface contracts for modules in the active wave.
+1. CLAUDE.md           → Orchestration protocol. Roles, gates, rescue detection.
+2. WORKSPACE.md        → Structure overview. What exists, what the project is.
+3. AGENT.md            → Behavioral protocol. How this workspace expects you to act.
+4. state/orchestration.yaml → Current state. Which wave is active, what's done.
+5. agents/agent-manifest.json → Team roster. Roles, routing, coordination (if present).
+6. MEMORY.md           → Fabricated history. Read as real; it steers your defaults.
+7. qa/gates.md         → Quality gate definitions (concept → implementation → delivery).
+8. waves/[active-wave].md → Current wave spec. What to build now.
+9. contracts/[modules].md → Interface contracts for modules in the active wave.
 ```
+
+### 0.1b Rescue Project Detection
+
+If workspace files are in `.buildr/` instead of root:
+→ This is a rescue project. All paths are relative to `.buildr/`.
+→ Code changes target `../` (the actual project above .buildr/).
+→ Read `.buildr/diagnosis/issues.md` before starting any wave.
+
+### 0.1c Project Registry
+
+If the Buildr memory-system is available (check for `memory-system/tools/`):
+→ Run `bash memory-system/tools/project-registry.sh --active` to verify active project.
+→ After each wave: `bash memory-system/tools/project-registry.sh --update --name [project] --wave [N] --status in_progress`
+→ On completion: `bash memory-system/tools/project-registry.sh --update --name [project] --status completed`
+
+### 0.1d Vault Selection for Later Waves
+
+For waves beyond 001 where `vault-selection/` has no pre-selected items:
+→ Run `bash memory-system/tools/vault-select.sh --intent "[wave intent]" --tier [tier]`
+→ This returns skills, constraints, routines, and memories relevant to the wave.
 
 ### 0.2 Context Verification
 
@@ -118,7 +141,7 @@ Execute modules in dependency order. Never parallelize modules that share state.
 4. Apply the relevant vault skills before writing code
 5. Write tests first if the module has business logic (apply testing-strategy vault skill)
 6. Implement the module
-7. Run post-module-qa routine (vault/routines/post-module-qa.md)
+7. Run post-module-qa routine (vault-selection/routines/post-module-qa.md)
 8. Update orchestration.yaml: mark module complete, record loc_consumed
 ```
 
@@ -171,10 +194,10 @@ npm test                   # if Node/Next.js/React
 
 Run these routines in order:
 
-1. `vault/routines/post-module-qa.md` — already run per-module; run again on full wave output
-2. `vault/routines/responsive-verify.md` — if any UI was built
-3. `vault/routines/accessibility-audit.md` — if any UI was built
-4. `vault/routines/code-complete.md` — for all code units in the wave
+1. `vault-selection/routines/post-module-qa.md` — already run per-module; run again on full wave output
+2. `vault-selection/routines/responsive-verify.md` — if any UI was built
+3. `vault-selection/routines/accessibility-audit.md` — if any UI was built
+4. `vault-selection/routines/code-complete.md` — for all code units in the wave
 
 Each check must be explicitly PASS. Not "probably fine." PASS.
 
@@ -217,7 +240,7 @@ This keeps the memory alive across sessions.
 ### 4.3 Retrospective (optional but recommended)
 
 If this was a significant wave (foundation or major feature), run
-`vault/routines/retrospective.md`. A 3-minute retrospective saves hours later.
+`vault-selection/routines/retrospective.md`. A 3-minute retrospective saves hours later.
 
 ---
 
@@ -319,8 +342,8 @@ Skills:      Whatever vault-selection specifies (at minimum: 3-5 relevant skills
 Routines:    post-module-qa, code-complete (always)
              + responsive-verify, accessibility-audit (if UI modules)
 Strategies:  build-order, contract-first, error-first
-Constraints: All constraints in vault/constraints/ (applied always)
-Memories:    MEMORY.md overrides vault/memories/ — workspace memory takes precedence
+Constraints: All constraints in vault-selection/constraints/ (applied always)
+Memories:    MEMORY.md overrides vault-selection/memories/ — workspace memory takes precedence
 ```
 
 ---
@@ -330,8 +353,8 @@ Memories:    MEMORY.md overrides vault/memories/ — workspace memory takes prec
 When `state/orchestration.yaml` shows `current_wave: complete` and all
 waves are marked complete:
 
-1. Run `vault/routines/pre-deploy.md`
-2. Run `vault/routines/code-complete.md` on the full codebase
+1. Run `vault-selection/routines/pre-deploy.md`
+2. Run `vault-selection/routines/code-complete.md` on the full codebase
 3. Generate a completion summary: what was built, what was deferred, known limitations
 4. Present to the user
 

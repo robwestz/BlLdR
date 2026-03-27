@@ -228,16 +228,34 @@ backlog: []
 
 Before delivering the workspace, verify:
 
+- [ ] CLAUDE.md exists (orchestration protocol with roles, gates, rescue detection)
 - [ ] WORKSPACE.md exists and is readable by a human in 2 minutes
 - [ ] PROJECT.md has hard constraints listed
 - [ ] SYSTEM.md has complete design system (colors, fonts, spacing)
 - [ ] MEMORY.md has vision + scars + insights + completion criteria
-- [ ] EVALUATOR.md exists and describes the evaluator role clearly
-- [ ] RUN.md includes the evaluator step in the default loop
-- [ ] state/orchestration.yaml has correct initial values
+- [ ] EVALUATOR.md exists and describes the reviewer role clearly
+- [ ] RUN.md includes quality gates and reviewer steps in the execution loop
+- [ ] agents/ directory exists with agent-manifest.json and per-agent .md files
+- [ ] qa/gates.md exists with 3-phase quality gates (concept → implementation → delivery)
+- [ ] state/orchestration.yaml has current_wave and next_wave fields
 - [ ] At least Wave 001 is defined
 - [ ] QA checklist covers all modules
-- [ ] A fresh agent with no prior context can start from WORKSPACE.md alone
+- [ ] A fresh agent with no prior context can start from CLAUDE.md alone
+
+## Phase 6: Register
+
+After workspace is verified, register it in the project registry:
+
+```bash
+bash memory-system/tools/project-registry.sh \
+  --register \
+  --name "[project-name]" \
+  --path "[workspace-path]" \
+  --category "[category]" \
+  --origin "new"
+```
+
+This enables cross-session tracking, pause/resume, and multi-project management.
 
 ## Key Principles
 

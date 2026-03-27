@@ -356,40 +356,63 @@ class WorkspaceBuilder:
         )
 
     def _write_vault_selection(self, out: Path, blueprint) -> List[str]:
+        """Copy selected vault files into workspace/vault-selection/ for self-contained execution.
+
+        Workspace must run without access to the Buildr repo. All vault items
+        are copied so a fresh agent can load them via workspace-local paths.
+        Returns list of all files written.
+        """
+        import shutil
         selection = self._resolve_wave_selection(blueprint)
         selection_dir = out / "vault-selection"
         selection_dir.mkdir(exist_ok=True)
+        repo_root = Path(__file__).resolve().parent.parent
+
+        created: List[str] = []
+        local_manifest: Dict[str, List[str]] = {
+            g: [] for g in ("skills", "constraints", "routines", "memories")
+        }
+        local_items: List[str] = []
+
+        for group in ("skills", "constraints", "routines", "memories"):
+            group_dir = selection_dir / group
+            group_dir.mkdir(exist_ok=True)
+            for item in selection.get(group, []):
+                item_path = Path(item)
+                if not item_path.is_absolute():
+                    item_path = repo_root / item_path
+                if item_path.exists() and item_path.is_file():
+                    dest = group_dir / item_path.name
+                    shutil.copy2(item_path, dest)
+                    created.append(str(dest))
+                    local_path = f"vault-selection/{group}/{item_path.name}"
+                    local_manifest[group].append(local_path)
+                    local_items.append(local_path)
+
+        # Write manifest with workspace-relative paths (not absolute repo paths)
         selection_path = selection_dir / "001-foundation.json"
         selection_path.write_text(
-            json.dumps(selection, indent=2, ensure_ascii=False),
+            json.dumps(local_manifest, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
+        created.append(str(selection_path))
 
+        # Patch wave file with workspace-local paths
         wave_path = out / "waves" / "001-foundation.md"
         if wave_path.exists():
             wave = wave_path.read_text(encoding="utf-8")
-            relative_items = []
-            repo_root = Path(__file__).resolve().parent.parent
-            for group in ("skills", "constraints", "routines", "memories"):
-                for item in selection.get(group, []):
-                    try:
-                        relative_items.append(str(Path(item).relative_to(repo_root)).replace("\\", "/"))
-                    except ValueError:
-                        relative_items.append(str(item).replace("\\", "/"))
-
-            block = "## Vault Items\nLoad these before executing:\n"
-            if relative_items:
-                block += "\n".join(f"- {item}" for item in relative_items)
+            block = "## Vault Items\nLoad these before executing (copied into vault-selection/):\n"
+            if local_items:
+                block += "\n".join(f"- {name}" for name in local_items)
             else:
                 block += "- (none selected for this wave)"
-
             if "## Vault Items" in wave and "\n## Steps" in wave:
                 before, remainder = wave.split("## Vault Items", 1)
                 _, after = remainder.split("\n## Steps", 1)
                 wave = before + block + "\n\n## Steps" + after
                 wave_path.write_text(wave, encoding="utf-8")
 
-        return [str(selection_path)]
+        return created
 
     def from_blueprint(self, blueprint, output_dir: str) -> List[str]:
         """Build workspace from an existing Forge blueprint."""
@@ -402,7 +425,8 @@ class WorkspaceBuilder:
             raise ImportError("forge_engine.py required for from_blueprint()")
 
         gen = ScaffoldGenerator()
-        files.extend(gen.generate(blueprint, output_dir))
+        # Onboarding ran before blueprint was created — mark complete in state
+        files.extend(gen.generate(blueprint, output_dir, onboarding_complete=True))
 
         files.extend(self._write_vault_selection(out, blueprint))
 
@@ -668,6 +692,17 @@ The evaluator is advisory, not automatically blocking, but its feedback is expec
 
 def main():
     import sys
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Buildr Bridge CLI")
+    parser.add_argument("--description", required=True, help="Project description")
+    parser.add_argument("--audience", default="", help="Target audience")
+    parser.add_argument("--feeling", default="", help="Project feeling/vibe")
+    parser.add_argument("--color", default="", help="Color preference")
+    parser.add_argument("--location", default="", help="Context location")
+    parser.add_argument("--out", default="./workspace", help="Output directory")
+    
+    args = parser.parse_args()
 
     print("\n" + "=" * 60)
     print("  FORGE × INDEX × IMPERFEKTUM")
@@ -701,47 +736,27 @@ def main():
     # Build workspace
     builder = WorkspaceBuilder(index_catalog=catalog_path)
 
-    print("\n  Describe your project:")
-    description = input("  > ").strip()
-    if not description:
-        print("  No description provided. Exiting.")
-        sys.exit(0)
-
-    print("\n  Who is it for?")
-    audience = input("  > ").strip()
-
-    print("\n  How should it feel? (professional, playful, minimal, warm, etc.)")
-    feeling = input("  > ").strip()
-
-    print("\n  Any color preference? (blue, red, green, etc.)")
-    color = input("  > ").strip()
-
-    print("\n  Location/context? (e.g., sweden, zanzibar, global)")
-    location = input("  > ").strip()
-
-    output_dir = input("\n  Output folder [./workspace]: ").strip() or "./workspace"
-
     files = builder.from_description(
-        description=description,
-        audience=audience,
-        feeling=feeling,
-        color=color,
-        location=location,
-        output_dir=output_dir,
+        description=args.description,
+        audience=args.audience,
+        feeling=args.feeling,
+        color=args.color,
+        location=args.location,
+        output_dir=args.out,
     )
 
     print(f"\n{'=' * 60}")
     print("  WORKSPACE GENERATED")
     print(f"{'=' * 60}")
-    print(f"\n  {len(files)} files in {output_dir}/")
+    print(f"\n  {len(files)} files in {args.out}/")
     print("\n  New files (beyond standard Forge):")
     for f in sorted(files):
         name = Path(f).name
-        if name in ("WORKSPACE.md", "MEMORY.md", "TOOLS.md"):
+        if name in ("WORKSPACE.md", "MEMORY.md", "TOOLS.md", "001-foundation.json"):
             print(f"    ✦ {name}")
 
     print("\n  Next steps:")
-    print(f"  1. Point your LLM agent at {output_dir}/")
+    print(f"  1. Point your LLM agent at {args.out}/")
     print("  2. Tell it: 'Read WORKSPACE.md, then follow AGENT.md'")
     print("  3. The project builds itself.")
     print(f"\n{'=' * 60}\n")

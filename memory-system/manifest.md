@@ -14,6 +14,8 @@
 | `wave-start.sh` | `[--tier T] [--engine E]` | Context to stdout |
 | `wave-end.sh` | `--session S --summary "..."` | All artifacts updated |
 | `doctor.sh` | `[--verbose]` | OK / issues with fixes |
+| `project-registry.sh` | `--register/--update/--list/--active/--pause/--resume` | registry/projects.json |
+| `vault-select.sh` | `--intent "..." --tier T [--category C] [--stack S]` | JSON with skills/constraints/routines/memories |
 
 ## Rules
 

@@ -7,10 +7,11 @@ One sentence: what this wave produces.
 A | B | C
 
 ## Vault Items
-Load these before executing:
-- vault/skills/[relevant-skill].md
-- vault/constraints/[relevant-constraint].md
-- vault/routines/[relevant-routine].md
+Load these before executing (items are in `vault-selection/`):
+- vault-selection/skills/[relevant-skill].md
+- vault-selection/constraints/[relevant-constraint].md
+- vault-selection/routines/[relevant-routine].md
+- vault-selection/memories/[relevant-memory].md
 
 ## Constraints
 - Paths allowed: [list]

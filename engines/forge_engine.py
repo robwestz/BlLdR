@@ -847,12 +847,12 @@ class ModuleResolver:
         "multilingual": ModuleSpec(
             id="multilingual", name="Multi-language Support",
             priority=ModulePriority.ENHANCEMENT, order=91,
-            depends_on=["pages"],
+            depends_on=[],  # Removed "pages" to support non-UI projects
             description="Language switcher and translated content.",
             acceptance_criteria=[
-                "Language switcher visible",
+                "Language switcher/selector available",
                 "Content switches between languages",
-                "URL reflects language selection",
+                "Routing or API reflects language selection",
                 "Default language matches primary audience",
             ]
         ),
@@ -892,7 +892,16 @@ class ModuleResolver:
         if "whatsapp" in spec.external_integrations:
             modules.append(self.SIGNAL_MODULES["whatsapp"])
         if len(spec.languages) > 1:
-            modules.append(self._customize(self.SIGNAL_MODULES["multilingual"], spec))
+            from dataclasses import asdict as _asdict
+            ml = ModuleSpec(**_asdict(self.SIGNAL_MODULES["multilingual"]))
+            existing_ids = {m.id for m in modules}
+            # Depend on "pages" for websites, "design-system" for all others
+            ml.depends_on = (
+                ["pages"] if "pages" in existing_ids
+                else ["design-system"] if "design-system" in existing_ids
+                else []
+            )
+            modules.append(self._customize(ml, spec))
 
         # SEO module for all websites and booking sites
         if spec.category in (ProjectCategory.WEBSITE, ProjectCategory.BOOKING,
@@ -963,8 +972,14 @@ class ScaffoldGenerator:
             result = result.replace("{{" + key + "}}", val)
         return result
 
-    def generate(self, blueprint: ProjectBlueprint, output_dir: str) -> List[str]:
-        """Generate all scaffold files. Returns list of created file paths."""
+    def generate(self, blueprint: ProjectBlueprint, output_dir: str,
+                 onboarding_complete: bool = False) -> List[str]:
+        """Generate all scaffold files. Returns list of created file paths.
+
+        Pass onboarding_complete=True when generating via the bridge (onboarding
+        was already run to produce the blueprint). False for Forge-only scaffolds
+        where the agent should run onboarding/prompt.md before building.
+        """
         out = Path(output_dir)
         out.mkdir(parents=True, exist_ok=True)
         (out / "modules").mkdir(exist_ok=True)
@@ -991,7 +1006,7 @@ class ScaffoldGenerator:
         # 4. Orchestration + wave + contract (canonical workspace contract)
         created.append(self._write(
             out / "state" / "orchestration.yaml",
-            self._render_orchestration_yaml(blueprint),
+            self._render_orchestration_yaml(blueprint, onboarding_complete),
         ))
         created.append(self._write(
             out / "waves" / "001-foundation.md",
@@ -1020,7 +1035,11 @@ class ScaffoldGenerator:
             self._render_run_md(blueprint),
         ))
 
-        # 6. Agent role files
+        # 6. Orchestration protocol + agent role files
+        claude_template = self._read_template("CLAUDE.md")
+        if claude_template:
+            created.append(self._write(out / "CLAUDE.md", claude_template))
+
         created.append(self._write(out / "AGENT.md",
                                    self._render_agent(blueprint)))
         created.append(self._write(out / "EVALUATOR.md",
@@ -1029,6 +1048,15 @@ class ScaffoldGenerator:
             out / "qa" / "evaluations" / "latest.md",
             self._render_evaluation_stub(blueprint),
         ))
+
+        # Copy onboarding prompt if it exists (for RUN.md step 6)
+        repo_root = Path(__file__).resolve().parent.parent
+        onboarding_src = repo_root / "templates" / "onboarding" / "prompt.md"
+        if onboarding_src.exists():
+            (out / "onboarding").mkdir(exist_ok=True)
+            import shutil
+            shutil.copy2(onboarding_src, out / "onboarding" / "prompt.md")
+            created.append(str(out / "onboarding" / "prompt.md"))
 
         # 7. Module files
         for module in blueprint.modules:
@@ -1413,14 +1441,16 @@ Agents: execute these steps in order.
 14. Report summary to user.
 """
 
-    def _render_orchestration_yaml(self, bp: ProjectBlueprint) -> str:
+    def _render_orchestration_yaml(self, bp: ProjectBlueprint,
+                                    onboarding_complete: bool = False) -> str:
         spec = bp.spec
         first = min(bp.modules, key=lambda m: m.order)
         mod_file = f"{first.order:02d}-{first.id}.md"
         proj = json.dumps(self._spec_display_name(spec))
+        onboarding_flag = "true" if onboarding_complete else "false"
         return f"""version: 1
 contract_version: 1
-onboarding_complete: false
+onboarding_complete: {onboarding_flag}
 phase: build
 loc_budget: 10000
 loc_consumed: 0
@@ -1450,6 +1480,19 @@ backlog: []
         if raw:
             body = raw.replace("Wave NNN:", "Wave 001:").replace(
                 "[Name]", first.name
+            ).replace(
+                "One sentence: what this wave produces.", f"Establish foundation for module {first.id}."
+            ).replace(
+                "A | B | C", "B"
+            ).replace(
+                "1. [Concrete action]\n2. [Concrete action]\n3. [Concrete action]",
+                f"1. Read modules/{mod_file} and SYSTEM.md §Design.\n2. Implement per module spec; keep contracts in contracts/.\n3. Run QA for this wave; update state/orchestration.yaml."
+            ).replace(
+                "- [ ] [Measurable: builds without errors]\n- [ ] [Measurable: QA checklist passes]\n- [ ] [Measurable: state updated with loc_consumed]",
+                "- [ ] Module acceptance criteria satisfied\n- [ ] QA checklist passes for this wave\n- [ ] state/orchestration.yaml updated (status, loc_consumed)"
+            ).replace(
+                "Expected: NNN lines",
+                "Expected: 500 lines"
             )
         else:
             body = f"""# Wave 001: {first.name}
@@ -1462,8 +1505,8 @@ B
 
 ## Vault Items
 Load these before executing (adjust to wave intent):
-- vault/skills/file-structure.md
-- vault/constraints/dependency-discipline.md
+- vault-selection/skills/file-structure.md
+- vault-selection/constraints/dependency-discipline.md
 
 ## Steps
 1. Read modules/{mod_file} and SYSTEM.md §Design.
@@ -1784,6 +1827,9 @@ Alla checks måste passera innan du går vidare till nästa modul.
 """
 
     def _render_agent(self, bp: ProjectBlueprint) -> str:
+        agent_template = self._read_template("AGENT.md")
+        if agent_template:
+            return agent_template
         return f"""# Builder Agent Instructions
 
 > Denna fil styr hur du (agenten) arbetar med detta projekt.

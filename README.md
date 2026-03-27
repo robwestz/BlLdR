@@ -18,7 +18,7 @@ The system combines six components:
 | Component | Purpose |
 |-----------|---------|
 | **Forge** | Onboarding + scaffold generation |
-| **Vault** | 100+ reusable, project-agnostic building blocks |
+| **Vault** | 90 reusable, project-agnostic building blocks |
 | **Orchestration** | Wave-based execution with progressive disclosure |
 | **Imperfektum** | Fabricated agent memories that prevent common mistakes |
 | **Index** | Catalog of all tools and capabilities |
@@ -64,6 +64,7 @@ cd my-project-workspace/
 | **buildr-executor** | Executes a workspace wave by wave to completion |
 | **buildr-smith** | Creates and maintains Vault items (the building blocks) |
 | **buildr-scout** | Extracts knowledge from external sources → system improvements |
+| **buildr-rescue** | Takes a stuck/broken project → diagnoses → wraps → fixes |
 
 ## Directory Structure
 
@@ -79,18 +80,19 @@ buildr/
 │   ├── vault_selector.py         Vault item selection per wave
 │   └── bridge.py                 Connects everything
 │
-├── skills/                    ← Agent skills (4)
+├── skills/                    ← Agent skills (5)
 │   ├── buildr-operator/          "I want to build X" → workspace
 │   ├── buildr-executor/          Workspace → finished build
 │   ├── buildr-smith/             Create/maintain Vault items
-│   └── buildr-scout/             Knowledge extraction → system evolution
+│   ├── buildr-scout/             Knowledge extraction → system evolution
+│   └── buildr-rescue/            Stuck project → diagnose → wrap → fix
 │
-├── vault/                     ← Reusable building blocks
-│   ├── skills/                   How to do things (20+)
-│   ├── constraints/              What not to do (10+)
-│   ├── strategies/               How to think about decisions (8+)
-│   ├── routines/                 Verification checklists (6+)
-│   └── memories/                 Imperfektum templates (12+)
+├── vault/                     ← Reusable building blocks (90 items)
+│   ├── skills/                   How to do things (33)
+│   ├── constraints/              What not to do (16)
+│   ├── strategies/               How to think about decisions (12)
+│   ├── routines/                 Verification checklists (13)
+│   └── memories/                 Imperfektum templates (16)
 │
 ├── memory-system/             ← Runtime memory
 │   ├── tools/                    13 bash scripts (wave lifecycle, discoveries)
@@ -133,238 +135,44 @@ buildr/
 
 ---
 
-# System Architecture
+## Architecture Deep Dive
 
-## Forge × Index × Imperfektum × Orchestration
+**Full design document:** `BUILDR_ARCHITECTURE.md` — read this to understand the complete system and extend it.
 
-> This document defines the complete system and serves as the bootstrap
-> instruction for an agent to assemble it.
+### The core mechanism in three sentences
+
+95% of what makes an agent effective is project-agnostic — validation routines, API patterns, error handling, testing strategies. Buildr separates this 95% into The Vault (reusable, permanent) from the 5% generated per-project by Forge (description, domain, design language). Imperfektum fabricates episodic memories that steer agent behavior as if it has prior experience with this specific type of project.
+
+### Why waves, not a single plan
+
+At wave 9, the agent should not need to remember waves 1–8. It only needs:
+
+```
+state/orchestration.yaml  ← Where am I? What's decided? What's the budget?
+contracts/                ← Interfaces between completed and future work
+waves/current-wave.md     ← What am I doing RIGHT NOW?
+vault/[selected items]    ← Which skills and constraints apply to THIS wave?
+```
+
+Wave 2 is planned after wave 1 completes — using real results, not predictions. Each wave's plan is sharper than any upfront plan could be.
+
+### Why Imperfektum works
+
+The Vault items are REAL and REUSED identically. The memories are FABRICATED and SPECIFIC.
+
+From the agent's perspective: Vault items feel novel each time (the 5% project context changes how they apply). Imperfektum memories feel real because they carry narrative weight and consequence. The agent behaves as if it has extensive experience with this exact type of project — even though it's its first time.
+
+### The builder/evaluator pattern
+
+Generated workspaces default to a two-agent loop: Builder produces, Evaluator reviews as a skeptical counterweight, Builder applies feedback. This prevents silent self-evaluation bias and catches errors before they compound across modules.
 
 ---
 
-## The Core Insight
+## Governance
 
-95% of what makes an agent effective is project-agnostic. Research skills,
-validation routines, code review checklists, architecture patterns, testing
-strategies, error recovery procedures — these are identical whether you're
-building a booking site, a SaaS platform, or a CLI tool.
+Skills and vault items follow the approval standard in `docs/skill-governance.md`.
 
-The remaining 5% is project-specific: the product vision, the domain model,
-the target audience, the design language.
-
-The system is designed so that:
-1. The agnostic 95% lives in a reusable library (The Vault)
-2. The specific 5% is generated per-project (Forge onboarding)
-3. Work is sequenced in waves with progressive disclosure (Orchestration)
-4. Fabricated episodic memory steers agent behavior (Imperfektum)
-5. Everything is cataloged and retrievable (The Index)
-6. Generated workspaces use a builder/evaluator execution pattern by default
-
----
-
-## System Components
-
-### 1. THE VAULT — Agnostic Skill Library
-
-A collection of ~100 reusable building blocks, each usable across ANY project.
-Every block follows the same format:
-
-```
-vault/
-├── skills/              # HOW to do things
-│   ├── research.md         # How to research a topic systematically
-│   ├── code-review.md      # How to review code for quality
-│   ├── api-design.md       # How to design a REST/GraphQL API
-│   ├── component-arch.md   # How to architect UI components
-│   ├── data-modeling.md    # How to design data models
-│   ├── error-handling.md   # How to implement error handling
-│   ├── testing-strategy.md # How to plan and write tests
-│   └── ...                 # (target: 30-40 skills)
-│
-├── constraints/         # WHAT NOT to do
-│   ├── code-hygiene.md     # No console.log, no inline styles, etc.
-│   ├── security.md         # Input sanitization, no secrets in code
-│   └── ...                 # (target: 15-20 constraints)
-│
-├── strategies/          # HOW TO THINK about problems
-│   ├── decomposition.md    # Break large tasks into small steps
-│   ├── contract-first.md   # Define interfaces before implementation
-│   └── ...                 # (target: 10-15 strategies)
-│
-├── routines/            # REPEATABLE PROCEDURES (like QA)
-│   ├── module-qa.md        # Post-module quality checklist
-│   ├── pre-deploy.md       # Pre-deployment verification
-│   └── ...                 # (target: 10-15 routines)
-│
-└── memories/            # IMPERFEKTUM TEMPLATES
-    ├── universal-scars.md  # Mistakes that apply to ALL projects
-    ├── universal-insights.md
-    ├── category/           # Per project type (booking, saas, etc.)
-    └── stack/              # Per technology (nextjs, python, etc.)
-```
-
-### KEY PROPERTY: Every file in The Vault is COMPLETE and SELF-CONTAINED.
-An agent can read any single file and use it immediately without needing
-any other file. No file references another file in The Vault.
-
-### KEY PROPERTY: Every file is AGNOSTIC.
-It says "when building a form, always validate on blur AND on submit"
-— not "for the Zanzibar booking site, validate the email field."
-The project-specific 5% is injected at runtime by the orchestrator.
-
----
-
-### 2. THE ORCHESTRATOR — Wave-Based Execution
-
-Based on the orchestration kit pattern. The orchestrator:
-
-1. Reads project state (what's done, what's next)
-2. Plans the CURRENT wave only (not future waves)
-3. Selects relevant Vault items for this wave
-4. Generates phase-specific Imperfektum memories
-5. Executes the wave
-6. Updates state
-7. Repeats
-
-### Default Execution Pattern: Builder + Evaluator
-
-Generated Buildr workspaces should not rely on a single agent silently
-self-evaluating its own output. The default pattern is:
-
-- **Builder** produces the current wave/module output
-- **Evaluator** reviews that output as a skeptical counterweight
-- **Builder** uses evaluator feedback as the default next input
-
-The evaluator is advisory by default, not automatically blocking, but it is
-part of the canonical execution loop and should be present in all generated
-workspaces.
-
-**Why this solves the N² context problem:**
-
-Traditional approach: Plan all N modules, maintain N×(N-1)/2 context links.
-Wave approach: Plan only the current wave. State captures decisions.
-Contracts capture interfaces. Completed waves are never re-read.
-
-At wave 9, the agent doesn't need to "remember" waves 1-8.
-It needs only: state file + active contracts + current wave spec.
-
-```
-state/orchestration.yaml    ← "Where am I? What's decided? What's the budget?"
-contracts/                  ← "What are the interfaces between completed and future work?"
-waves/current-wave.md       ← "What am I doing RIGHT NOW?"
-vault/[selected items]      ← "What skills/constraints apply to THIS wave?"
-```
-
-**The organic planning principle:**
-
-Wave 1 is planned during onboarding.
-Wave 2 is planned AFTER wave 1 completes — using the actual results, not predictions.
-Wave 3 is planned after wave 2.
-
-Each wave's plan is sharper than any upfront plan could be, because it's informed
-by what actually happened in previous waves.
-
----
-
-### 3. IMPERFEKTUM — Phase-Specific Memory Generation
-
-Instead of generating one big MEMORY.md at project start, Imperfektum generates
-FRESH memories at each wave boundary:
-
-```
-Before Wave 1 (Foundation):
-  → Universal scars + foundation-specific insights
-  → Memory of what "done" looks like for this wave specifically
-
-Before Wave 2 (Design System):
-  → Universal scars + design-system scars
-  → "Last time we built the design system, we made 5 base components and
-     tested each one at 3 breakpoints before moving on. That discipline
-     saved us 2 days of rework later."
-
-Before Wave 3 (Core Feature):
-  → Category-specific scars (booking calendar, e-commerce cart, etc.)
-  → Memories informed by what Wave 1 and 2 ACTUALLY produced
-  → "The design system we built in Wave 2 uses CSS variables for all colors.
-     When building the calendar component, we MUST use these variables."
-```
-
-This means the memories get MORE SPECIFIC as the project progresses,
-because each wave's memory can reference actual state from completed waves.
-
----
-
-### 4. THE BRIDGE — Connects Everything
-
-```python
-class SystemOrchestrator:
-    """The runtime that ties Vault + Orchestration + Imperfektum + Index together."""
-
-    def execute_wave(self, wave_number: int):
-        # 1. Read state
-        state = self.read_state()
-
-        # 2. Read current wave spec
-        wave = self.read_wave(wave_number)
-
-        # 3. Select relevant Vault items for this wave
-        skills = self.vault.select_skills(wave.intent, wave.tier)
-        constraints = self.vault.select_constraints(wave.tier)
-        routines = self.vault.select_routines(wave.tier)
-
-        # 4. Generate phase-specific Imperfektum memory
-        memory = self.imperfektum.generate_for_wave(
-            wave=wave,
-            state=state,
-            completed_contracts=self.read_contracts(),
-        )
-
-        # 5. Assemble agent context for this wave
-        context = self.assemble_context(
-            state=state,
-            wave=wave,
-            skills=skills,
-            constraints=constraints,
-            memory=memory,
-        )
-
-        # 6. Execute (hand off to agent)
-        result = self.agent.execute(context)
-
-        # 7. Update state
-        self.update_state(wave_number, result)
-
-        # 8. Plan next wave (ORGANIC — based on actual results)
-        if wave.is_last_planned:
-            self.plan_next_wave(state, result)
-```
-
----
-
-## The Manufactured Déjà Vu Effect
-
-The deepest insight in this architecture:
-
-The Vault's 100 agnostic items are REAL. They exist. They are reused
-identically across projects. They are the genuine constants.
-
-The Imperfektum memories are FABRICATED. They never happened. They are
-manufactured experiences tailored to each specific context.
-
-But from the agent's perspective, the relationship inverts:
-
-- The Vault items feel NOVEL each time, because the 5% project-specific
-  context modifies how they're applied. "validate on blur" means something
-  different for a booking calendar vs. a CRM form.
-
-- The Imperfektum memories feel REAL, because they carry narrative weight,
-  specific details, and emotional consequence. The agent "remembers" the
-  mistake and avoids it.
-
-This inversion is the mechanism. The fake memories provide stability.
-The real skills provide novelty. Together they create an agent that
-behaves as if it has extensive, relevant experience with the specific
-project it's building — even though it's its first time.
+A skill is only approved when the agent has exhausted its maximum ability to conceptualize, precision, and formulate how a purpose is achieved. This is not a style preference — it is an ability transfer standard.
 
 ---
 

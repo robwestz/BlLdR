@@ -15,7 +15,7 @@
 - [ ] Module boundaries are defined with interfaces
 - [ ] Risks are identified with mitigations
 - [ ] A specialist can implement this without asking questions
-- [ ] Design system is complete (colors, typography, spacing)
+- [ ] Design system is complete (colors, typography, spacing) **(UI projects)**
 - [ ] Wave 001 scope is achievable within LOC budget
 
 ### If FAIL

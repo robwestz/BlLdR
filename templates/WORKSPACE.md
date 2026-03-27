@@ -17,6 +17,7 @@
 | **RUN.md** | Execution entrypoint (canonical loop) | During build |
 | **state/orchestration.yaml** | Progress, budgets, wave status | Each session / after updates |
 | **waves/** | Wave intents and vault loads | Per wave |
+| **vault-selection/** | Vault items selected for this project | Per wave (paths declared in wave file) |
 | **contracts/** | Locked decisions and interfaces | When touching shared boundaries |
 | **RUNBOOK.md** | Optional per-module detail (if present) | During build — supplemental to RUN.md |
 | **modules/** | Per-module specifications | Per module |

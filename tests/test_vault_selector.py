@@ -38,6 +38,36 @@ class TestSelectSkills(unittest.TestCase):
         intent = "payment api deploy"
         self.assertEqual(select_skills(intent), select_skills(intent))
 
+    def test_upload_keyword_maps_to_file_upload(self) -> None:
+        out = select_skills("file upload form")
+        self.assertIn("file-upload.md", _basenames(out))
+
+    def test_realtime_keyword_maps_to_realtime_updates(self) -> None:
+        out = select_skills("realtime websocket live update")
+        self.assertIn("realtime-updates.md", _basenames(out))
+
+    def test_schema_keyword_maps_to_both_data_and_database_skills(self) -> None:
+        # "schema" is a multi-skill keyword → should return both files
+        out = _basenames(select_skills("schema design"))
+        self.assertIn("data-modeling.md", out)
+        self.assertIn("database-schema.md", out)
+
+    def test_modal_keyword_maps_to_modal_dialog(self) -> None:
+        out = select_skills("modal dialog overlay")
+        self.assertIn("modal-dialog.md", _basenames(out))
+
+    def test_environment_keyword_maps_to_environment_config(self) -> None:
+        out = select_skills("environment config secret env")
+        self.assertIn("environment-config.md", _basenames(out))
+
+    def test_pagination_keyword_maps_to_pagination(self) -> None:
+        out = select_skills("pagination infinite scroll")
+        self.assertIn("pagination.md", _basenames(out))
+
+    def test_error_boundary_keyword(self) -> None:
+        out = select_skills("error boundary crash fallback")
+        self.assertIn("error-boundary.md", _basenames(out))
+
 
 class TestSelectConstraints(unittest.TestCase):
     def test_tier_a_includes_security(self) -> None:
@@ -50,11 +80,38 @@ class TestSelectConstraints(unittest.TestCase):
             select_constraints("A"),
         )
 
+    def test_tier_a_includes_new_architecture_constraints(self) -> None:
+        out = _basenames(select_constraints("A"))
+        self.assertIn("no-untyped-props.md", out)
+        self.assertIn("no-direct-db-in-ui.md", out)
+
+    def test_tier_b_includes_new_runtime_constraints(self) -> None:
+        out = _basenames(select_constraints("B"))
+        self.assertIn("no-magic-routes.md", out)
+        self.assertIn("no-implicit-any.md", out)
+
+    def test_tier_c_includes_async_constraint(self) -> None:
+        out = _basenames(select_constraints("C"))
+        self.assertIn("no-sync-in-async.md", out)
+
 
 class TestSelectRoutines(unittest.TestCase):
     def test_tier_c_includes_code_complete(self) -> None:
         out = select_routines("C")
         self.assertIn("code-complete.md", _basenames(out))
+
+    def test_tier_a_includes_dependency_audit_and_pre_commit(self) -> None:
+        out = _basenames(select_routines("A"))
+        self.assertIn("dependency-audit.md", out)
+        self.assertIn("pre-commit.md", out)
+
+    def test_tier_b_includes_security_check(self) -> None:
+        out = _basenames(select_routines("B"))
+        self.assertIn("security-check.md", out)
+
+    def test_tier_c_includes_performance_check(self) -> None:
+        out = _basenames(select_routines("C"))
+        self.assertIn("performance-check.md", out)
 
 
 class TestSelectMemories(unittest.TestCase):
@@ -65,6 +122,23 @@ class TestSelectMemories(unittest.TestCase):
         self.assertIn("universal-insights.md", names)
         self.assertIn("booking.md", names)
         self.assertIn("nextjs.md", names)
+
+    def test_suffixed_memory_naming_convention_found(self) -> None:
+        # api-memories.md uses the new {name}-memories.md convention
+        out = select_memories(category="api")
+        self.assertIn("api-memories.md", _basenames(out))
+
+    def test_suffixed_stack_memory_found(self) -> None:
+        # typescript-memories.md uses the new convention
+        out = select_memories(stack="typescript")
+        self.assertIn("typescript-memories.md", _basenames(out))
+
+    def test_unknown_category_returns_only_universals(self) -> None:
+        out = select_memories(category="nonexistent-xyz")
+        names = _basenames(out)
+        self.assertIn("universal-scars.md", names)
+        self.assertIn("universal-insights.md", names)
+        self.assertEqual(len(out), 2)
 
 
 class TestSelectForWave(unittest.TestCase):

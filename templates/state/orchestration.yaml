@@ -8,6 +8,8 @@ loc_consumed: 0
 file_touch_budget: null
 evaluation_mode: advisory
 last_evaluation_summary: ""
+current_wave: "001-foundation"
+next_wave: null
 waves:
   "001-foundation":
     status: pending

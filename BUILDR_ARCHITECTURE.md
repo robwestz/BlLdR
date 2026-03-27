@@ -30,81 +30,84 @@ The system is designed so that:
 
 ### 1. THE VAULT — Agnostic Skill Library
 
-A collection of ~100 reusable building blocks, each usable across ANY project.
-Every block follows the same format:
+90 reusable building blocks, each usable across ANY project.
+All minimum targets met. Full index: `vault/INDEX.md`.
 
 ```
 vault/
-├── skills/              # HOW to do things
-│   ├── research.md         # How to research a topic systematically
-│   ├── code-review.md      # How to review code for quality
-│   ├── api-design.md       # How to design a REST/GraphQL API
-│   ├── component-arch.md   # How to architect UI components
-│   ├── data-modeling.md    # How to design data models
-│   ├── error-handling.md   # How to implement error handling
-│   ├── testing-strategy.md # How to plan and write tests
-│   ├── performance.md      # How to optimize for performance
-│   ├── accessibility.md    # How to build accessible interfaces
-│   ├── responsive.md       # How to build responsive layouts
-│   ├── state-management.md # How to manage application state
-│   ├── form-validation.md  # How to validate user input
-│   ├── auth-patterns.md    # How to implement authentication
-│   ├── payment-flow.md     # How to implement payment flows
-│   ├── i18n.md             # How to internationalize
-│   ├── seo.md              # How to optimize for search engines
-│   ├── deploy.md           # How to deploy to production
-│   └── ...                 # (target: 30-40 skills)
+├── skills/              # HOW to do things (33 files — target met)
+│   ├── api-design.md           ├── logging-observability.md
+│   ├── accessibility-check.md  ├── modal-dialog.md
+│   ├── auth-patterns.md        ├── notification-system.md
+│   ├── code-review.md          ├── pagination.md
+│   ├── component-arch.md       ├── payment-flow.md
+│   ├── component-creation.md   ├── performance.md
+│   ├── dark-mode.md            ├── realtime-updates.md
+│   ├── data-fetch.md           ├── research.md
+│   ├── data-modeling.md        ├── responsive-layout.md
+│   ├── database-schema.md      ├── search-filter.md
+│   ├── deploy-checklist.md     ├── seo.md
+│   ├── drag-drop.md            ├── state-design.md
+│   ├── environment-config.md   ├── testing-strategy.md
+│   ├── error-boundary.md       ├── file-structure.md
+│   ├── error-handling.md       ├── file-upload.md
+│   ├── form-validation.md      ├── i18n.md
+│   └── input-sanitization.md
 │
-├── constraints/         # WHAT NOT to do
-│   ├── code-hygiene.md     # No console.log, no inline styles, etc.
-│   ├── token-budget.md     # Budget tracking rules
-│   ├── file-discipline.md  # File naming, structure, limits
-│   ├── dependency.md       # Minimize external deps, justify each
-│   ├── security.md         # Input sanitization, no secrets in code
-│   ├── accessibility.md    # WCAG AA minimum, semantic HTML
-│   ├── performance.md      # Bundle size limits, image optimization
-│   └── ...                 # (target: 15-20 constraints)
+├── constraints/         # WHAT NOT to do (16 files — target met)
+│   ├── accessibility.md        ├── no-implicit-any.md
+│   ├── code-hygiene.md         ├── no-inline-styles.md
+│   ├── dependency-discipline.md├── no-magic-routes.md
+│   ├── no-console-log.md       ├── no-placeholder-content.md
+│   ├── no-direct-db-in-ui.md   ├── no-sync-in-async.md
+│   ├── no-empty-catch.md       ├── no-untyped-props.md
+│   ├── no-hardcoded-values.md  ├── performance.md
+│   ├── security.md             └── token-budget.md
 │
-├── strategies/          # HOW TO THINK about problems
-│   ├── decomposition.md    # Break large tasks into small steps
-│   ├── progressive-enhancement.md  # Build simple first, layer complexity
-│   ├── contract-first.md   # Define interfaces before implementation
-│   ├── mobile-first.md     # Design for smallest viewport first
-│   ├── error-first.md      # Handle errors before happy path
-│   ├── 30-70-rule.md       # Implement 30% that's hardest to design
-│   └── ...                 # (target: 10-15 strategies)
+├── strategies/          # HOW TO THINK about problems (12 files — target met)
+│   ├── build-order.md          ├── mobile-first.md
+│   ├── contract-first.md       ├── progressive-enhancement.md
+│   ├── decomposition.md        ├── scope-cut.md
+│   ├── error-first.md          ├── tech-choice.md
+│   ├── error-vs-feature.md     ├── test-scope.md
+│   ├── when-to-abstract.md     └── when-to-cache.md
 │
-├── routines/            # REPEATABLE PROCEDURES (like QA)
-│   ├── module-qa.md        # Post-module quality checklist
-│   ├── pre-deploy.md       # Pre-deployment verification
-│   ├── code-complete.md    # Definition of "done" for a code unit
-│   ├── ux-review.md        # UX quality verification
-│   ├── responsive-check.md # Responsive breakpoint verification
-│   ├── retrospective.md    # Post-phase retrospective template
-│   └── ...                 # (target: 10-15 routines)
+├── routines/            # REPEATABLE PROCEDURES (13 files — target met)
+│   ├── accessibility-audit.md  ├── performance-check.md
+│   ├── api-endpoint-check.md   ├── post-module-qa.md
+│   ├── code-complete.md        ├── pre-commit.md
+│   ├── database-migration-check.md ├── pre-deploy.md
+│   ├── dependency-audit.md     ├── responsive-verify.md
+│   ├── retrospective.md        ├── security-check.md
+│   └── wave-handoff.md
 │
-├── contracts/           # INTERFACE TEMPLATES
-│   ├── api-contract.md     # REST API contract template
-│   ├── component-contract.md # UI component contract template
-│   ├── data-contract.md    # Data model contract template
-│   ├── integration-contract.md # Third-party integration template
-│   └── ...                 # (target: 5-10 templates)
-│
-└── memories/            # IMPERFEKTUM TEMPLATES
-    ├── universal-scars.md  # Mistakes that apply to ALL projects
-    ├── universal-insights.md # Approaches that always work
+└── memories/            # IMPERFEKTUM TEMPLATES (16 files)
+    ├── universal-scars.md
+    ├── universal-insights.md
     ├── category/
-    │   ├── booking-scars.md
-    │   ├── ecommerce-scars.md
-    │   ├── webapp-scars.md
-    │   ├── saas-scars.md
-    │   └── ...
+    │   ├── api-memories.md     ← {name}-memories.md convention
+    │   ├── booking.md
+    │   ├── dashboard-memories.md
+    │   ├── ecommerce.md
+    │   ├── saas.md
+    │   ├── tool.md
+    │   ├── webapp.md
+    │   └── website.md
     └── stack/
-        ├── nextjs-scars.md
-        ├── react-vite-scars.md
-        ├── python-scars.md
-        └── ...
+        ├── nextjs.md
+        ├── prisma-memories.md
+        ├── python.md
+        ├── react-vite.md
+        ├── static-html.md
+        └── typescript-memories.md
 ```
+
+**Memory naming:** Files may use `{name}.md` (legacy) or `{name}-memories.md` (current).
+`vault_selector.py` handles both conventions transparently.
+
+**Selection:** `engines/vault_selector.py` selects relevant items per wave via
+keyword matching (skills), tier mapping (constraints + routines), and
+category/stack lookup (memories). Multi-skill keywords supported.
 
 ### KEY PROPERTY: Every file in The Vault is COMPLETE and SELF-CONTAINED.
 An agent can read any single file and use it immediately without needing
@@ -177,35 +180,65 @@ by what actually happened in previous waves.
 
 ---
 
-### 3. IMPERFEKTUM — Phase-Specific Memory Generation
+### 3. IMPERFEKTUM — Fabricated Project Memory
 
-Instead of generating one big MEMORY.md at project start, Imperfektum generates
-FRESH memories at each wave boundary:
+Imperfektum generates a MEMORY.md at workspace creation time. The memory
+contains fabricated episodic experiences tailored to the project category
+and tech stack — scars (mistakes made) and insights (what worked).
+
+**Current implementation (bridge path):**
+One MEMORY.md is written when `from_blueprint()` runs. It combines:
+- Universal scars and insights (always included)
+- Category-specific memories (e.g., booking.md, saas.md)
+- Stack-specific memories (e.g., nextjs.md, python.md)
+- Tool-aware memories from the Index (if a catalog is available)
 
 ```
-Before Wave 1 (Foundation):
-  → Universal scars + foundation-specific insights
-  → Memory of what "done" looks like for this wave specifically
-
-Before Wave 2 (Design System):
-  → Universal scars + design-system scars
-  → "Last time we built the design system, we made 5 base components and
-     tested each one at 3 breakpoints before moving on. That discipline
-     saved us 2 days of rework later."
-
-Before Wave 3 (Core Feature):
-  → Category-specific scars (booking calendar, e-commerce cart, etc.)
-  → Memories informed by what Wave 1 and 2 ACTUALLY produced
-  → "The design system we built in Wave 2 uses CSS variables for all colors.
-     When building the calendar component, we MUST use these variables."
+MEMORY.md in a generated workspace contains:
+  → universal-scars.md (mistakes that happen on every project)
+  → universal-insights.md (principles that always work)
+  → category/[type].md (e.g., booking-specific scars)
+  → stack/[tech].md (e.g., nextjs-specific memories)
 ```
 
-This means the memories get MORE SPECIFIC as the project progresses,
-because each wave's memory can reference actual state from completed waves.
+**Aspirational model (not yet wired):**
+Fresh memories at each wave boundary — memories that reference actual
+state from completed waves and grow more specific as the project
+progresses. This requires the memory-system runtime layer to be
+integrated into the execution loop, which is planned but not built.
 
 ---
 
-### 4. THE BRIDGE — Connects Everything
+### 4. SYSTEM SKILLS — Agent Pipelines for the System Itself
+
+Beyond vault items (which instruct agents *how* to do things), the system
+has four agent-level skills that orchestrate the system as a whole:
+
+```
+skills/
+├── buildr-operator/SKILL.md   # Takes a human description → complete workspace
+│                              # (Forge + Index + Imperfektum + Vault selection)
+├── buildr-smith/SKILL.md      # Creates and maintains Vault items
+│                              # (the armorer — builds the tools)
+├── buildr-scout/SKILL.md      # Extracts knowledge from external sources
+│                              # (absorbs articles/docs → vault items + directives)
+└── buildr-executor/SKILL.md   # Picks up a workspace and builds it wave by wave
+                               # (the counterpart to Operator — runs the project)
+```
+
+**The role separation:**
+- Operator creates the workspace. Executor runs it.
+- Smith builds the vault. Scout expands it from the outside world.
+
+Each skill is fully self-contained with its own `references/architecture.md`.
+
+**Governance:** `docs/skill-governance.md` defines the approval standard —
+a skill is only approved when the agent has exhausted its maximum ability
+to conceptualize, precision, and formulate how a purpose is achieved.
+
+---
+
+### 5. THE BRIDGE — Connects Everything
 
 ```python
 class SystemOrchestrator:
@@ -249,6 +282,26 @@ class SystemOrchestrator:
         if wave.is_last_planned:
             self.plan_next_wave(state, result)
 ```
+
+### 6. MEMORY SYSTEM — Persistent Session Intelligence
+
+`memory-system/` is the runtime memory layer (separate from Imperfektum):
+
+```
+memory-system/
+├── tools/                    # Shell scripts: wave-start, wave-end,
+│   │                         # discovery-write, context-load, etc.
+├── continuum/discoveries.jsonl  # Raw discovery append-log
+├── context/                  # Generated hot/warm tier snapshots
+│   ├── wave-brief.md         # Hot tier: current session context
+│   └── distilled.md          # Warm tier: multi-session synthesis
+└── templates/                # circuit-breaker, known-errors, decisions
+```
+
+Imperfektum generates FABRICATED memories at project-start.
+Memory System captures REAL discoveries during execution.
+They are complementary: Imperfektum steers defaults,
+Memory System records what actually happened.
 
 ---
 
@@ -337,33 +390,58 @@ project it's building — even though it's its first time.
 
 ---
 
-## Practical Next Steps
+## Current State
 
-### To build the minimum viable system:
+The system is built and operational. All bootstrap waves are complete.
 
-1. **Create The Vault** — 30 agnostic skills, 10 constraints, 5 strategies,
-   5 routines. Each is a standalone .md file.
+### What exists
 
-2. **Adapt the orchestration kit** — Use the uploaded SKILL.md pattern.
-   Create: CLAUDE.md, RUN.md, state schema, wave template.
+| Component | Status | Files |
+|-----------|--------|-------|
+| The Vault | ✓ Complete | 90 items (all targets met) |
+| System Skills | ✓ Complete | operator, smith, scout, executor |
+| Forge Engine | ✓ Complete | `engines/forge_engine.py` |
+| Imperfektum | ✓ Complete | `engines/imperfektum_engine.py` |
+| Vault Selector | ✓ Complete | `engines/vault_selector.py` |
+| The Bridge | ✓ Complete | `engines/bridge.py` |
+| Memory System | ✓ Complete | `memory-system/` (15 tools) |
+| Workspace Templates | ✓ Complete | `templates/` (8 files) |
+| Governance | ✓ Complete | `docs/skill-governance.md` |
+| Tests | ✓ 29 tests | all passing |
+| **Total** | | **~185 files** |
 
-3. **Connect Imperfektum** — Generate phase-specific memories at wave
-   boundaries using Vault memories as templates + state as context.
+### File counts (actual)
+- Vault: 90 files (33 skills + 16 constraints + 12 strategies + 13 routines + 16 memories)
+- System skills: 8 files (4 skills × SKILL.md + references/architecture.md)
+- Engines: 5 files (forge, imperfektum, bridge, vault_selector, __init__)
+- Memory system: ~20 files
+- Templates: 8 files
+- Tests: 4 files
+- Governance + plans: 4 files
 
-4. **Connect Forge** — Use onboarding to generate the project-specific 5%
-   (description, audience, feeling, design system).
+### Remaining capacity
+- Vault has room for 8-18 more items before hitting maximum targets
+- Memory templates: 4-14 more toward 20-30 target (mobile, tailwind, realtime)
+- System skills: buildr-auditor, buildr-retrospective (backlogged)
+- See `docs/plans/2026-03-27-skill-program.md` for the full backlog
 
-5. **Connect Index** — Catalog the Vault, enable tool/skill selection.
+### Running the system
+```bash
+# Generate a workspace from a description (CLI)
+python -m engines.bridge --description "Booking site for fishing trips in Zanzibar" --out ./my-project
 
-### File count for MVP:
-- Vault: ~50 files (skills + constraints + strategies + routines)
-- Orchestration: 5 files (CLAUDE.md, RUN.md, state, onboarding, wave template)
-- Engines: 4 files (forge_engine.py, imperfektum_engine.py, bridge.py, vault_selector.py)
-- Total: ~60 files, most of them small .md documents
+# Optional flags
+# --audience "Tourists"  --feeling "professional"  --color "blue"  --location "zanzibar"
 
-This is not a large system. It's a small system with large leverage.
+# Run tests
+python -m unittest -v
+
+# Select vault items for a wave (interactive)
+python -c "from engines.vault_selector import select_for_wave; print(select_for_wave('api schema', 'B', 'api', 'nextjs'))"
+```
 
 ---
 
-*This document is the seed. An agent reading it has everything needed
-to begin the bootstrap. The system builds itself.*
+*This document was the seed. The system built itself.
+An agent reading it now has a complete, operational system to work with —
+not a blueprint to assemble, but a foundation to extend.*
