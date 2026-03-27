@@ -17,6 +17,8 @@
 - `skills/buildr-executor/SKILL.md` — buildr-executor: execute a Buildr workspace wave by wave to completion
 - `skills/buildr-executor/references/architecture.md` — Executor state machine, file map, and Operator contrast
 - `skills/buildr-operator/SKILL.md` — buildr-operator
+- `skills/buildr-rescue/SKILL.md` — buildr-rescue: import stuck/broken projects, diagnose, wrap, fix
+- `skills/buildr-rescue/references/architecture.md` — Rescue overlay pattern, diagnosis engine
 - `skills/buildr-scout/SKILL.md` — buildr-scout
 - `skills/buildr-smith/SKILL.md` — buildr-smith
 
@@ -41,6 +43,7 @@
 - `form-validation`
 - `i18n`
 - `input-sanitization`
+- `logging-observability`
 - `modal-dialog`
 - `notification-system`
 - `pagination`
@@ -60,6 +63,7 @@
 - `dependency-discipline`
 - `no-console-log`
 - `no-direct-db-in-ui`
+- `no-empty-catch`
 - `no-hardcoded-values`
 - `no-implicit-any`
 - `no-inline-styles`
@@ -87,7 +91,9 @@
 
 ## Vault — Routines (verification)
 - `accessibility-audit`
+- `api-endpoint-check`
 - `code-complete`
+- `database-migration-check`
 - `dependency-audit`
 - `performance-check`
 - `post-module-qa`
@@ -96,6 +102,7 @@
 - `responsive-verify`
 - `retrospective`
 - `security-check`
+- `wave-handoff`
 
 ## Vault — Memories (Imperfektum templates)
 - `vault/memories/universal-insights.md`
@@ -184,4 +191,4 @@
 
 ---
 
-**Total: 181 files**
+**Total: 190 files**
