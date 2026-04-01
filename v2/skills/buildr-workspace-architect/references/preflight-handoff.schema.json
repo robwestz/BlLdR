@@ -1,0 +1,757 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "buildr-preflight-handoff",
+  "title": "Buildr Preflight Handoff Schema",
+  "description": "Single source of truth for all machine-readable preflight artifact payloads. Covers purpose (CRI), absence mapping (ELS), architecture, acceptance criteria, challenge, decisions, and approval.",
+  "type": "object",
+  "$defs": {
+    "phase_meta": {
+      "type": "object",
+      "properties": {
+        "phase_name": {
+          "type": "string",
+          "enum": [
+            "purpose_extraction",
+            "absence_mapping",
+            "minimal_inevitable_architecture",
+            "skeptical_challenge",
+            "approval_synthesis"
+          ]
+        },
+        "project_slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,62}[a-z0-9]$|^[a-z0-9]$"
+        },
+        "timestamp_utc": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["phase_name", "project_slug", "timestamp_utc"]
+    },
+    "purpose_payload": {
+      "title": "Phase 1: Purpose Extraction (with CRI)",
+      "type": "object",
+      "properties": {
+        "meta": { "$ref": "#/$defs/phase_meta" },
+        "purpose_claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "claim_id": {
+                "type": "string",
+                "pattern": "^PC-[0-9]{3}$"
+              },
+              "claim_text": {
+                "type": "string",
+                "minLength": 10
+              },
+              "falsifiable": {
+                "type": "boolean",
+                "const": true
+              }
+            },
+            "required": ["claim_id", "claim_text", "falsifiable"]
+          },
+          "minItems": 1
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "assumption_text": { "type": "string" },
+              "source": {
+                "type": "string",
+                "enum": ["stated", "inferred"]
+              }
+            },
+            "required": ["assumption_text", "source"]
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "exclusion_text": { "type": "string" },
+              "justification": { "type": "string" }
+            },
+            "required": ["exclusion_text", "justification"]
+          }
+        },
+        "provisional_scope": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "cri": { "$ref": "#/$defs/cri" },
+        "status": {
+          "type": "string",
+          "enum": ["complete", "insufficient_information"]
+        },
+        "required_missing_inputs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": [
+        "meta",
+        "purpose_claims",
+        "assumptions",
+        "exclusions",
+        "cri",
+        "status"
+      ],
+      "if": {
+        "properties": { "status": { "const": "insufficient_information" } }
+      },
+      "then": {
+        "properties": {
+          "required_missing_inputs": { "minItems": 1 }
+        },
+        "required": ["required_missing_inputs"]
+      }
+    },
+    "cri": {
+      "title": "Commercial Reality Invariants",
+      "type": "object",
+      "properties": {
+        "target_customer_or_user_class": {
+          "type": "string",
+          "minLength": 3
+        },
+        "primary_user_job_to_be_done": {
+          "type": "string",
+          "minLength": 10
+        },
+        "business_outcome_hypothesis": {
+          "type": "string",
+          "minLength": 10
+        },
+        "monetization_model": {
+          "type": "string",
+          "enum": [
+            "none",
+            "subscription",
+            "usage",
+            "transaction_fee",
+            "ads",
+            "enterprise_contract",
+            "other",
+            "unknown"
+          ]
+        },
+        "must_have_constraints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "constraint_text": { "type": "string" },
+              "source": {
+                "type": "string",
+                "enum": ["user_stated", "unknown"]
+              }
+            },
+            "required": ["constraint_text", "source"]
+          }
+        },
+        "kill_switch_triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "trigger_text": { "type": "string" },
+              "binary_condition": { "type": "string" }
+            },
+            "required": ["trigger_text", "binary_condition"]
+          }
+        }
+      },
+      "required": [
+        "target_customer_or_user_class",
+        "primary_user_job_to_be_done",
+        "business_outcome_hypothesis",
+        "monetization_model",
+        "must_have_constraints",
+        "kill_switch_triggers"
+      ]
+    },
+    "absence_payload": {
+      "title": "Phase 2: Absence Mapping (with ELS)",
+      "type": "object",
+      "properties": {
+        "meta": { "$ref": "#/$defs/phase_meta" },
+        "absences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "absence_id": {
+                "type": "string",
+                "pattern": "^AB-[0-9]{3}$"
+              },
+              "description": { "type": "string" },
+              "related_purpose_claims": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "classification": {
+                "type": "string",
+                "enum": ["derivable", "askable", "deferrable", "blocking"]
+              },
+              "consequence_if_unresolved": { "type": "string" }
+            },
+            "required": [
+              "absence_id",
+              "description",
+              "related_purpose_claims",
+              "classification",
+              "consequence_if_unresolved"
+            ]
+          }
+        },
+        "known_unknowns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "unknown_text": { "type": "string" },
+              "impact_if_materialized": { "type": "string" },
+              "mitigation_plan": { "type": "string" }
+            },
+            "required": [
+              "unknown_text",
+              "impact_if_materialized",
+              "mitigation_plan"
+            ]
+          }
+        },
+        "els_risks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/els_risk" },
+          "minItems": 6
+        },
+        "els_categories_addressed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "category": { "$ref": "#/$defs/els_category" },
+              "status": {
+                "type": "string",
+                "enum": ["analyzed", "not_applicable"]
+              },
+              "not_applicable_proof": { "type": "string" }
+            },
+            "required": ["category", "status"]
+          },
+          "minItems": 6,
+          "maxItems": 6
+        },
+        "status": {
+          "type": "string",
+          "enum": ["complete", "insufficient_information"]
+        },
+        "required_missing_inputs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": [
+        "meta",
+        "absences",
+        "known_unknowns",
+        "els_risks",
+        "els_categories_addressed",
+        "status"
+      ],
+      "if": {
+        "properties": { "status": { "const": "insufficient_information" } }
+      },
+      "then": {
+        "properties": {
+          "required_missing_inputs": { "minItems": 1 }
+        },
+        "required": ["required_missing_inputs"]
+      }
+    },
+    "els_category": {
+      "type": "string",
+      "enum": [
+        "security_abuse_and_threats",
+        "privacy_and_data_governance",
+        "payments_and_money_movement",
+        "operational_reliability",
+        "accessibility_and_inclusive_design",
+        "legal_and_policy_constraints"
+      ]
+    },
+    "els_risk": {
+      "title": "Expensive-Late-Failure Risk",
+      "type": "object",
+      "properties": {
+        "els_id": {
+          "type": "string",
+          "pattern": "^ELS-[0-9]{3}$"
+        },
+        "category": { "$ref": "#/$defs/els_category" },
+        "risk": { "type": "string" },
+        "why_late_discovery_is_expensive": { "type": "string" },
+        "earliest_cheap_mitigation_stage": {
+          "type": "string",
+          "enum": ["preflight", "workspace_gen", "execution"]
+        },
+        "residual_open_risk": { "type": "boolean" }
+      },
+      "required": [
+        "els_id",
+        "category",
+        "risk",
+        "why_late_discovery_is_expensive",
+        "earliest_cheap_mitigation_stage",
+        "residual_open_risk"
+      ]
+    },
+    "architecture_payload": {
+      "title": "Phase 3: Minimal-Inevitable Architecture",
+      "type": "object",
+      "properties": {
+        "meta": { "$ref": "#/$defs/phase_meta" },
+        "minimal_inevitable_set": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "component_id": {
+                "type": "string",
+                "pattern": "^COMP-[0-9]{3}$"
+              },
+              "component_name": { "type": "string" },
+              "classification": {
+                "type": "string",
+                "enum": ["core", "supporting"]
+              },
+              "justification": { "type": "string" },
+              "purpose_claims_served": {
+                "type": "array",
+                "items": { "type": "string" },
+                "minItems": 1
+              },
+              "impact_if_removed": { "type": "string" }
+            },
+            "required": [
+              "component_id",
+              "component_name",
+              "classification",
+              "justification",
+              "purpose_claims_served",
+              "impact_if_removed"
+            ]
+          },
+          "minItems": 1
+        },
+        "non_goals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "non_goal_text": { "type": "string" },
+              "justification": { "type": "string" }
+            },
+            "required": ["non_goal_text", "justification"]
+          },
+          "minItems": 1
+        },
+        "evidence_basis": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "status": {
+          "type": "string",
+          "enum": ["complete", "rejected"]
+        },
+        "rejection_reasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": [
+        "meta",
+        "minimal_inevitable_set",
+        "non_goals",
+        "status"
+      ],
+      "if": {
+        "properties": { "status": { "const": "rejected" } }
+      },
+      "then": {
+        "properties": {
+          "rejection_reasons": { "minItems": 1 }
+        },
+        "required": ["rejection_reasons"]
+      }
+    },
+    "acceptance_payload": {
+      "title": "Phase 3: Acceptance Criteria Packaging",
+      "type": "object",
+      "properties": {
+        "meta": { "$ref": "#/$defs/phase_meta" },
+        "acceptance_criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "acceptance_id": {
+                "type": "string",
+                "pattern": "^AC-[0-9]{3}$"
+              },
+              "criterion_text": {
+                "type": "string",
+                "minLength": 10
+              },
+              "verification_method": {
+                "type": "string",
+                "enum": [
+                  "automated_test",
+                  "manual_binary_check",
+                  "api_response_validation",
+                  "ui_state_verification",
+                  "data_integrity_check",
+                  "security_gate_check",
+                  "performance_threshold"
+                ]
+              },
+              "purpose_claim_refs": {
+                "type": "array",
+                "items": { "type": "string" },
+                "minItems": 1
+              },
+              "pass_condition": { "type": "string" },
+              "fail_condition": { "type": "string" }
+            },
+            "required": [
+              "acceptance_id",
+              "criterion_text",
+              "verification_method",
+              "purpose_claim_refs",
+              "pass_condition",
+              "fail_condition"
+            ]
+          },
+          "minItems": 5
+        },
+        "non_goals_for_acceptance": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "minimum_criteria_count_formula": {
+          "type": "string",
+          "const": "max(5, ceil(purpose_claims_count * 2))"
+        },
+        "purpose_claims_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "computed_minimum": {
+          "type": "integer",
+          "minimum": 5
+        }
+      },
+      "required": [
+        "meta",
+        "acceptance_criteria",
+        "non_goals_for_acceptance",
+        "minimum_criteria_count_formula",
+        "purpose_claims_count",
+        "computed_minimum"
+      ]
+    },
+    "challenge_payload": {
+      "title": "Phase 4: Skeptical Challenge",
+      "type": "object",
+      "properties": {
+        "meta": { "$ref": "#/$defs/phase_meta" },
+        "challenged_components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "component_id": { "type": "string" },
+              "component_name": { "type": "string" },
+              "challenge_question": { "type": "string" },
+              "challenge_result": {
+                "type": "string",
+                "enum": ["confirmed", "adjusted", "removed"]
+              },
+              "adjustment_rationale": { "type": "string" },
+              "related_decision_id": { "type": "string" }
+            },
+            "required": [
+              "component_id",
+              "component_name",
+              "challenge_question",
+              "challenge_result"
+            ]
+          }
+        },
+        "challenged_exclusions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "non_goal_text": { "type": "string" },
+              "challenge_question": { "type": "string" },
+              "exclusion_safe": { "type": "boolean" },
+              "risk_if_excluded": { "type": "string" }
+            },
+            "required": [
+              "non_goal_text",
+              "challenge_question",
+              "exclusion_safe"
+            ]
+          }
+        },
+        "challenged_els_risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "els_id": { "type": "string" },
+              "mitigation_sufficient": { "type": "boolean" },
+              "challenge_note": { "type": "string" }
+            },
+            "required": [
+              "els_id",
+              "mitigation_sufficient",
+              "challenge_note"
+            ]
+          }
+        },
+        "open_risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "risk_text": { "type": "string" },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high"]
+              },
+              "mitigation_plan": { "type": "string" },
+              "related_decision_id": { "type": "string" }
+            },
+            "required": ["risk_text", "severity", "mitigation_plan"]
+          }
+        }
+      },
+      "required": [
+        "meta",
+        "challenged_components",
+        "challenged_exclusions",
+        "open_risks"
+      ]
+    },
+    "decision_record": {
+      "title": "Single Decision Record",
+      "type": "object",
+      "properties": {
+        "decision_id": {
+          "type": "string",
+          "pattern": "^DEC-[0-9]{3}$"
+        },
+        "decision_statement": {
+          "type": "string",
+          "minLength": 10
+        },
+        "alternatives_considered": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "alternative_text": { "type": "string" },
+              "rejection_rationale": { "type": "string" }
+            },
+            "required": ["alternative_text", "rejection_rationale"]
+          },
+          "minItems": 2
+        },
+        "selected_rationale": { "type": "string" },
+        "reversibility_cost_if_wrong": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "reversibility_reason": { "type": "string" },
+        "owner_of_decision": {
+          "type": "string",
+          "enum": [
+            "user_explicit",
+            "inferred_high_confidence",
+            "inferred_low_confidence"
+          ]
+        },
+        "related_purpose_claims": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "related_component_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": [
+        "decision_id",
+        "decision_statement",
+        "alternatives_considered",
+        "selected_rationale",
+        "reversibility_cost_if_wrong",
+        "reversibility_reason",
+        "owner_of_decision"
+      ]
+    },
+    "decisions_payload": {
+      "title": "Phase 4: Decision Records",
+      "type": "object",
+      "properties": {
+        "meta": { "$ref": "#/$defs/phase_meta" },
+        "decisions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/decision_record" }
+        }
+      },
+      "required": ["meta", "decisions"]
+    },
+    "approval_payload": {
+      "title": "Phase 5: Approval Synthesis",
+      "type": "object",
+      "properties": {
+        "meta": { "$ref": "#/$defs/phase_meta" },
+        "status": {
+          "type": "string",
+          "enum": ["approved", "rejected", "insufficient_information"]
+        },
+        "approval_basis": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "rejection_reasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "required_missing_inputs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "open_risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "risk_text": { "type": "string" },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high"]
+              },
+              "mitigation_plan": { "type": "string" }
+            },
+            "required": ["risk_text", "severity", "mitigation_plan"]
+          }
+        },
+        "non_goals": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "minimal_inevitable_set": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "allowed_next_step": {
+          "type": "string",
+          "enum": [
+            "workspace_generation",
+            "rerun_preflight",
+            "user_input_required",
+            "project_cancelled"
+          ]
+        },
+        "gates_verified": {
+          "type": "object",
+          "properties": {
+            "phase_1_cri_complete": { "type": "boolean" },
+            "phase_2_els_complete": { "type": "boolean" },
+            "phase_2_els_payment_privacy_gate": { "type": "boolean" },
+            "phase_3_acceptance_minimum_met": { "type": "boolean" },
+            "phase_4_decision_gate": { "type": "boolean" },
+            "phase_1_monetization_gate": { "type": "boolean" }
+          },
+          "required": [
+            "phase_1_cri_complete",
+            "phase_2_els_complete",
+            "phase_2_els_payment_privacy_gate",
+            "phase_3_acceptance_minimum_met",
+            "phase_4_decision_gate",
+            "phase_1_monetization_gate"
+          ]
+        }
+      },
+      "required": [
+        "meta",
+        "status",
+        "open_risks",
+        "non_goals",
+        "minimal_inevitable_set",
+        "allowed_next_step",
+        "gates_verified"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "approved" } }
+          },
+          "then": {
+            "properties": {
+              "approval_basis": { "minItems": 1 },
+              "allowed_next_step": { "const": "workspace_generation" }
+            },
+            "required": ["approval_basis"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "rejected" } }
+          },
+          "then": {
+            "properties": {
+              "rejection_reasons": { "minItems": 1 },
+              "allowed_next_step": {
+                "enum": ["rerun_preflight", "project_cancelled"]
+              }
+            },
+            "required": ["rejection_reasons"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "const": "insufficient_information" } }
+          },
+          "then": {
+            "properties": {
+              "required_missing_inputs": { "minItems": 1 },
+              "allowed_next_step": { "const": "user_input_required" }
+            },
+            "required": ["required_missing_inputs"]
+          }
+        }
+      ]
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/$defs/purpose_payload" },
+    { "$ref": "#/$defs/absence_payload" },
+    { "$ref": "#/$defs/architecture_payload" },
+    { "$ref": "#/$defs/acceptance_payload" },
+    { "$ref": "#/$defs/challenge_payload" },
+    { "$ref": "#/$defs/decisions_payload" },
+    { "$ref": "#/$defs/approval_payload" }
+  ]
+}

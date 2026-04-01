@@ -283,7 +283,50 @@ class SystemOrchestrator:
             self.plan_next_wave(state, result)
 ```
 
-### 6. MEMORY SYSTEM — Persistent Session Intelligence
+### 6. V2 PREFLIGHT LAYER — Mandatory Architecture Gate
+
+The v2 layer adds a mandatory preflight pipeline between the human's project
+description and workspace generation. It does not replace any existing component.
+
+```
+Human description
+    |
+    v
+[buildr-workspace-architect]   ← NEW: 5-phase preflight (v2)
+    |
+    v  PREFLIGHT_APPROVAL.json (status: approved)
+    |
+[operator-like generation]     ← Existing operator pipeline
+    |
+    v  Generated workspace
+    |
+[buildr-executor]              ← Unchanged
+```
+
+**Five preflight phases:**
+
+1. **Purpose Extraction** — freeze purpose + Commercial Reality Invariants (CRI)
+2. **Absence Mapping** — surface unknowns + Expensive-Late-Failure Scan (ELS)
+3. **Minimal-Inevitable Architecture** — smallest component set + acceptance criteria
+4. **Skeptical Challenge** — adversarial review + decision records
+5. **Approval Synthesis** — binary gate: `approved` | `rejected` | `insufficient_information`
+
+**Staging path:** `v2/.buildr/preflight/<project-slug>/`
+
+**v1 enforcement:** Prompt-enforced (agent follows instructions).
+**v2+ enforcement:** Code-enforced in forge/bridge (schema validation).
+
+**Key files:**
+- `v2/prompts/buildr-advanced-operator.md` — advanced agent identity
+- `v2/skills/buildr-workspace-architect/SKILL.md` — preflight skill
+- `v2/skills/.../references/preflight-handoff.schema.json` — payload schema
+- `engines/preflight_validate.py` — v1.5 CLI validator
+
+See `docs/v2-overview.md` for the full reference.
+
+---
+
+### 7. MEMORY SYSTEM — Persistent Session Intelligence
 
 `memory-system/` is the runtime memory layer (separate from Imperfektum):
 
@@ -404,6 +447,8 @@ The system is built and operational. All bootstrap waves are complete.
 | Imperfektum | ✓ Complete | `engines/imperfektum_engine.py` |
 | Vault Selector | ✓ Complete | `engines/vault_selector.py` |
 | The Bridge | ✓ Complete | `engines/bridge.py` |
+| V2 Preflight | ✓ Complete | `v2/` (prompt + skill + 6 references + schema) |
+| Preflight Validator | ✓ Complete | `engines/preflight_validate.py` |
 | Memory System | ✓ Complete | `memory-system/` (15 tools) |
 | Workspace Templates | ✓ Complete | `templates/` (8 files) |
 | Governance | ✓ Complete | `docs/skill-governance.md` |

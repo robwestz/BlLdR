@@ -47,6 +47,17 @@ Phase 4: GENERATE (produce the complete workspace folder)
 Phase 5: VERIFY (confirm workspace is self-contained and executable)
 ```
 
+## Two entry paths (legacy vs advanced / v2)
+
+| Path | When | Workspace generation |
+|------|------|----------------------|
+| **Legacy / basic** | User invokes this skill directly with no prior preflight | Run Phases 1–5 from scratch as below. |
+| **Advanced (v2)** | User runs **Buildr Advanced Operator** (`v2/prompts/buildr-advanced-operator.md`) | **Mandatory:** preflight must complete first via `buildr-workspace-architect`. Do **not** redefine approved purpose, CRI, acceptance, or architecture decisions. Ingest staging under `v2/.buildr/preflight/<project-slug>/` per **`references/preflight-ingest.md`**. |
+
+**Before generating** in the advanced path, binary gate (when artifacts exist): run  
+`python -m engines.preflight_validate <staging-dir>` — exit code `0` required.  
+Overview: **`docs/v2-overview.md`**. Vault routine: **`vault/routines/preflight-gate-check.md`**.
+
 ## Phase 1: Onboarding
 
 Ask human questions. Never technical questions. Maximum 8 questions total.

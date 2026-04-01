@@ -1,0 +1,4 @@
+# Buildr system dependencies
+# jsonschema is optional — preflight_validate.py works without it
+# but skips schema validation. Install for full v1.5 gate:
+jsonschema>=4.0

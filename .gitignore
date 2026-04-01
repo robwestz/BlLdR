@@ -7,3 +7,5 @@ __pycache__/
 .venv/
 node_modules/
 test_workspace_*/
+v2/.buildr/
+repobrain-rescue/

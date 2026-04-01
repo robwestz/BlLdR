@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "name": "repobrain",
+    "path": "C:/Users/robin/Downloads/buildrhel/repobrain-rescue",
+    "category": "web-app",
+    "origin": "rescue",
+    "status": "completed",
+    "current_wave": "004",
+    "created": "2026-03-27",
+    "last_touched": "2026-03-27",
+    "paused_reason": null,
+    "resume_hint": "All 4 waves complete. Build passes. Ready for npm run dev."
+  },
+  {
+    "name": "buildr-nu",
+    "path": "C:/Users/robin/Downloads/buildr-nu-workspace",
+    "category": "web-app",
+    "origin": "new",
+    "status": "in_progress",
+    "current_wave": "001",
+    "created": "2026-03-27",
+    "last_touched": "2026-03-27",
+    "paused_reason": null,
+    "resume_hint": null
+  },
+  {
+    "name": "buildr-nu-site",
+    "path": "C:/Users/robin/Downloads/buildr-nu-site",
+    "category": "website",
+    "origin": "new",
+    "status": "in_progress",
+    "current_wave": "001",
+    "created": "2026-03-28",
+    "last_touched": "2026-03-28",
+    "paused_reason": null,
+    "resume_hint": null
+  }
+]

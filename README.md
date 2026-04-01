@@ -26,7 +26,7 @@ The system combines six components:
 
 ## Quick Start
 
-### Option A: Use with Claude Code / agent CLI
+### Option A: Use with Claude Code / agent CLI (basic flow)
 
 ```bash
 # Copy skills to your agent's skill directory
@@ -38,6 +38,18 @@ cp -r skills/buildr-scout/ ~/.claude/skills/
 # Tell your agent:
 # "I want to build a booking site for fishing trips in Zanzibar"
 # The operator skill handles the rest.
+```
+
+### Option A2: Advanced flow (with preflight architecture gate)
+
+```bash
+# Install v2 skill
+cp -r v2/skills/buildr-workspace-architect/ skills/buildr-workspace-architect/
+
+# Load the advanced operator prompt as system prompt
+# (v2/prompts/buildr-advanced-operator.md)
+# This adds mandatory 5-phase preflight before workspace generation.
+# See docs/v2-overview.md for details.
 ```
 
 ### Option B: Use the Python engines directly
@@ -65,6 +77,7 @@ cd my-project-workspace/
 | **buildr-smith** | Creates and maintains Vault items (the building blocks) |
 | **buildr-scout** | Extracts knowledge from external sources → system improvements |
 | **buildr-rescue** | Takes a stuck/broken project → diagnoses → wraps → fixes |
+| **buildr-workspace-architect** | (v2) Mandatory preflight: 5-phase architecture gate before generation |
 
 ## Directory Structure
 
@@ -80,7 +93,12 @@ buildr/
 │   ├── vault_selector.py         Vault item selection per wave
 │   └── bridge.py                 Connects everything
 │
-├── skills/                    ← Agent skills (5)
+├── v2/                        ← V2 preflight architecture layer
+│   ├── prompts/                  Advanced operator prompt
+│   ├── skills/                   Workspace architect skill + references
+│   └── improve.md                Ground-repo hardening backlog
+│
+├── skills/                    ← Agent skills (6)
 │   ├── buildr-operator/          "I want to build X" → workspace
 │   ├── buildr-executor/          Workspace → finished build
 │   ├── buildr-smith/             Create/maintain Vault items

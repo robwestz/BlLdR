@@ -62,7 +62,7 @@ Each item is self-contained and project-agnostic.
 | `security` | XSS, exposed secrets, injection |
 | `token-budget` | Excessive comments, speculative code |
 
-## Strategies (12)
+## Strategies (13)
 
 | File | Thinking Pattern |
 |------|-----------------|
@@ -77,9 +77,10 @@ Each item is self-contained and project-agnostic.
 | `tech-choice` | How to pick between technology options |
 | `test-scope` | What deserves a test; when to skip |
 | `when-to-abstract` | Concrete vs generic |
+| `preflight-reopen` | When approved preflight may be changed |
 | `when-to-cache` | When caching adds value vs complexity |
 
-## Routines (13)
+## Routines (14)
 
 | File | Trigger |
 |------|---------|
@@ -95,14 +96,19 @@ Each item is self-contained and project-agnostic.
 | `responsive-verify` | After any visual change |
 | `retrospective` | After every phase/wave |
 | `security-check` | Before exposing any endpoint to the internet |
+| `preflight-gate-check` | Before starting workspace generation (advanced flow) |
 | `wave-handoff` | Before ending session mid-wave, or at wave completion |
 
-## Memories (16)
+## Memories (20)
 
 | File | Scope |
 |------|-------|
 | `universal-scars` | All projects |
 | `universal-insights` | All projects |
+| `execution/builder-evaluator-memories` | Builder/evaluator execution loops |
+| `execution/wave-handoff-memories` | Session and wave handoffs |
+| `execution/qa-regression-memories` | QA depth and regression prevention |
+| `execution/rework-drift-memories` | Scope drift, rework loops, execution control |
 | `category/api-memories` | REST API / backend service projects |
 | `category/booking` | Booking/reservation projects |
 | `category/dashboard-memories` | Admin/analytics dashboard projects |

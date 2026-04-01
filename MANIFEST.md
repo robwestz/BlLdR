@@ -12,15 +12,24 @@
 - `engines/forge_engine.py` — Onboarding, derivation, modules, scaffold generation
 - `engines/imperfektum_engine.py` — Fabricated project memory generation
 - `engines/vault_selector.py` — Stateless selector for vault skills, constraints, routines, memories
+- `engines/preflight_validate.py` — v1.5 preflight artifact validator (binary gate)
 
 ## Skills (Agent capabilities)
 - `skills/buildr-executor/SKILL.md` — buildr-executor: execute a Buildr workspace wave by wave to completion
 - `skills/buildr-executor/references/architecture.md` — Executor state machine, file map, and Operator contrast
 - `skills/buildr-operator/SKILL.md` — buildr-operator
+- `skills/buildr-operator/references/preflight-ingest.md` — How operator ingests approved preflight artifacts
 - `skills/buildr-rescue/SKILL.md` — buildr-rescue: import stuck/broken projects, diagnose, wrap, fix
 - `skills/buildr-rescue/references/architecture.md` — Rescue overlay pattern, diagnosis engine
 - `skills/buildr-scout/SKILL.md` — buildr-scout
 - `skills/buildr-smith/SKILL.md` — buildr-smith
+- `skills/buildr-workspace-architect/SKILL.md` — buildr-workspace-architect (v2): mandatory 5-phase preflight architecture gate
+- `skills/buildr-workspace-architect/references/architecture.md` — System placement and anti-pattern justification
+- `skills/buildr-workspace-architect/references/phases.md` — Phase depth, anti-patterns, drift prevention
+- `skills/buildr-workspace-architect/references/contracts.md` — Inter-phase handoff contracts
+- `skills/buildr-workspace-architect/references/preflight-handoff.schema.json` — Machine-readable payload schema (single source of truth)
+- `skills/buildr-workspace-architect/references/approval.md` — Approval/rejection/insufficient semantics
+- `skills/buildr-workspace-architect/references/integration-with-operator.md` — Operator boundary and install rule
 
 ## Vault — Skills (how to do things)
 - `accessibility-check`
@@ -157,19 +166,34 @@
 - `templates/state/orchestration.yaml`
 - `templates/waves/000-template.md`
 
+## V2 Preflight Layer
+- `v2/prompts/buildr-advanced-operator.md` — Advanced agent identity with mandatory preflight
+- `v2/skills/buildr-workspace-architect/SKILL.md` — Source-of-truth for the preflight skill
+- `v2/skills/buildr-workspace-architect/references/*` — 6 reference files + JSON schema
+- `v2/claude.md` — Canonical v2 authoring spec
+- `v2/start.md` — Session bootstrap for v2 authoring
+- `v2/improve.md` — Ground-repo hardening backlog
+
 ## Governance
 - `docs/skill-governance.md` — Skill approval standard, classification decision tree, quality gates by type
 
-## Plans
+## Plans & Docs
 - `docs/plans/2026-03-27-structural-completion-design.md`
 - `docs/plans/2026-03-27-structural-completion-implementation.md`
 - `docs/plans/2026-03-27-skill-program.md` — Skill program backlog: 30+ items toward vault coverage targets
+- `docs/BUILDR-purpose-and-layers.md` — Syfte, lager, specifikt vs strukturellt uppfyllande, agentens förslagsmandat, koppling till start/improve (canonical; speglad i `v2/docs/`)
+- `v2/docs/README.md` — Index för v2/docs
+- `v2/docs/purpose-and-layers.md` — Spegel av `docs/BUILDR-purpose-and-layers.md`
+- `docs/v2-overview.md` — V2 preflight layer overview (flow, paths, install, v1 vs v2+)
+- `docs/workspace-from-preflight.md` — Ingest map: preflight fields → workspace targets
+- `docs/preflight-retention-policy.md` — Git, retention, immutability for preflight artifacts
 
 ## Tests
 - `tests/__init__.py`
 - `tests/test_bridge_integration.py`
 - `tests/test_vault_selector.py`
 - `tests/test_workspace_generation.py`
+- `tests/test_preflight_validate.py` — preflight staging directory validator (v1.5 gate)
 
 ## Catalog (The Index)
 - `catalog/index.json` — 11 indexed tools
@@ -191,4 +215,9 @@
 
 ---
 
-**Total: 190 files**
+## Dependencies
+- `requirements.txt` — Python dependencies (jsonschema for preflight validation)
+
+---
+
+**Total: ~210 files**
