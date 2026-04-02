@@ -27,6 +27,8 @@ Human description
 
 | File | Purpose |
 |------|---------|
+| `v2/ENTRY.md` | **Single entry point** — menu of everything you can do in v2; point agents here (`@v2/ENTRY.md`) |
+| `v2/run.ps1` | Interactive PowerShell menu (opens docs, copies skill, runs validator/tests) |
 | `v2/prompts/buildr-advanced-operator.md` | System prompt for the advanced flow |
 | `v2/skills/buildr-workspace-architect/SKILL.md` | The preflight skill (5 phases) |
 | `v2/skills/.../references/preflight-handoff.schema.json` | Single source of truth for JSON payloads |
@@ -36,7 +38,10 @@ Human description
 | `v2/skills/.../references/approval.md` | Approval/rejection/insufficient semantics |
 | `v2/skills/.../references/integration-with-operator.md` | Operator boundary and install rule |
 | `v2/improve.md` | Ground-repo backlog (post-v2 hardening) |
+| `v2/start.md` | Bootstrap session to author v2 files from `v2/claude.md` (AUTHOR_GATE) |
+| `v2/docs/README.md` | Index for `v2/docs/` (purpose-and-layers mirror) |
 | `engines/preflight_validate.py` | v1.5 binary gate (CLI validator) |
+| `schemas/preflight/README.md` | Where the canonical JSON Schema lives (no duplicate file) |
 
 ## Staging Path
 
@@ -80,6 +85,8 @@ The authoritative spec for v2 content is `v2/claude.md`. Other copies (`v2-codex
 
 ## Related Docs
 
+- `v2/start.md` — Empty-session bootstrap to materialize v2 artifacts per `v2/claude.md`
+- `docs/BUILDR-purpose-and-layers.md` — Why Buildr exists (layers vs workspace), specific vs structural fulfillment, agent mandate to propose feasible work (mirror: `v2/docs/purpose-and-layers.md`)
 - `docs/workspace-from-preflight.md` — How preflight artifacts drive workspace generation
 - `docs/preflight-retention-policy.md` — Git, retention, and immutability rules
 - `skills/buildr-operator/references/preflight-ingest.md` — Operator's view of preflight

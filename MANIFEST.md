@@ -181,7 +181,9 @@
 - `docs/plans/2026-03-27-structural-completion-design.md`
 - `docs/plans/2026-03-27-structural-completion-implementation.md`
 - `docs/plans/2026-03-27-skill-program.md` — Skill program backlog: 30+ items toward vault coverage targets
-- `docs/BUILDR-purpose-and-layers.md` — Syfte, lager, specifikt vs strukturellt uppfyllande, agentens förslagsmandat, koppling till start/improve (canonical; speglad i `v2/docs/`)
+- `docs/BUILDR-purpose-and-layers.md` — Syfte, lager, specifikt vs strukturellt uppfyllande, agentens förslagsmandat, koppling till start/improve, prescriptiv generation (canonical; speglad i `v2/docs/`)
+- `schemas/preflight/README.md` — Var canonical `preflight-handoff.schema.json` lever (ingen duplicerad fil i denna mapp)
+- `templates/preflight/README.md` — Pekare till ingest-doc; policy om placeholders
 - `v2/docs/README.md` — Index för v2/docs
 - `v2/docs/purpose-and-layers.md` — Spegel av `docs/BUILDR-purpose-and-layers.md`
 - `docs/v2-overview.md` — V2 preflight layer overview (flow, paths, install, v1 vs v2+)

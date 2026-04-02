@@ -107,6 +107,18 @@ Do not repeat them. The insights listed there worked. Replicate them.
 `state/orchestration.yaml` tracks `loc_budget` and `loc_consumed`.
 Each wave declares expected LOC consumption. Overruns require user approval.
 
+## Cross-Vendor Agents
+
+This workspace supports multiple LLM vendors working in parallel.
+Entry-point files map vendor-specific tools and model tiers:
+
+- `ENTRY-claude.md` — Claude Code (Anthropic): sub-agent spawning, model tiers
+- `ENTRY-codex.md` — Codex / ChatGPT (OpenAI): sequential or parallel terminals
+- `ENTRY-gemini.md` — Gemini CLI (Google): sequential or parallel terminals
+
+For parallel execution across vendors, see `parallel_phases` in `state/orchestration.yaml`.
+Independent waves within the same phase can be assigned to different vendors/terminals.
+
 ## Restart Protocol
 If context is lost (new session, compaction):
 1. Read this file (CLAUDE.md)

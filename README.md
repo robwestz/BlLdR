@@ -24,6 +24,8 @@ The system combines six components:
 | **Index** | Catalog of all tools and capabilities |
 | **Memory System** | Runtime discovery logging, context tiers, wave tracking |
 
+**Purpose, layers & agent intent:** why Buildr is more than “a workspace folder”, how **specific** and **structural** work can both fulfill the same user goal, and how agents should reason from **repo capability → intent** — see **`docs/BUILDR-purpose-and-layers.md`** (mirror: `v2/docs/purpose-and-layers.md`).
+
 ## Quick Start
 
 ### Option A: Use with Claude Code / agent CLI (basic flow)
@@ -87,6 +89,8 @@ buildr/
 ├── BUILDR_ARCHITECTURE.md     ← Full system design document
 ├── MANIFEST.md                ← Complete system inventory
 │
+├── schemas/preflight/         ← README: where canonical preflight JSON Schema lives (no duplicate file)
+│
 ├── engines/                   ← Python runtime
 │   ├── forge_engine.py           Onboarding → scaffold
 │   ├── imperfektum_engine.py     Fabricated memory generation
@@ -94,8 +98,11 @@ buildr/
 │   └── bridge.py                 Connects everything
 │
 ├── v2/                        ← V2 preflight architecture layer
+│   ├── ENTRY.md                  **Start here** — menu of v2 options (or run v2/run.ps1)
+│   ├── run.ps1                   Interactive menu (Windows PowerShell)
 │   ├── prompts/                  Advanced operator prompt
 │   ├── skills/                   Workspace architect skill + references
+│   ├── docs/                     purpose-and-layers (mirror of docs/BUILDR-purpose-and-layers.md)
 │   └── improve.md                Ground-repo hardening backlog
 │
 ├── skills/                    ← Agent skills (6)

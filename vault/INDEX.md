@@ -3,7 +3,7 @@
 Quick reference for all available building blocks.
 Each item is self-contained and project-agnostic.
 
-## Skills (33)
+## Skills (35)
 
 | File | Domain |
 |------|--------|
@@ -26,6 +26,8 @@ Each item is self-contained and project-agnostic.
 | `file-upload` | Upload flow, type validation, storage |
 | `form-validation` | User input, forms |
 | `i18n` | Multi-language support |
+| `implementation-playbook` | Module spec → working code step by step |
+| `contract-authoring` | Interface contracts between modules |
 | `logging-observability` | Structured logging, correlation IDs, health checks |
 | `input-sanitization` | Sanitize user input before storage or display |
 | `modal-dialog` | Focus trap, keyboard nav, scroll lock |
@@ -62,7 +64,7 @@ Each item is self-contained and project-agnostic.
 | `security` | XSS, exposed secrets, injection |
 | `token-budget` | Excessive comments, speculative code |
 
-## Strategies (13)
+## Strategies (14)
 
 | File | Thinking Pattern |
 |------|-----------------|
@@ -77,10 +79,11 @@ Each item is self-contained and project-agnostic.
 | `tech-choice` | How to pick between technology options |
 | `test-scope` | What deserves a test; when to skip |
 | `when-to-abstract` | Concrete vs generic |
+| `parallel-wave-execution` | Run independent waves concurrently |
 | `preflight-reopen` | When approved preflight may be changed |
 | `when-to-cache` | When caching adds value vs complexity |
 
-## Routines (14)
+## Routines (15)
 
 | File | Trigger |
 |------|---------|
@@ -97,6 +100,7 @@ Each item is self-contained and project-agnostic.
 | `retrospective` | After every phase/wave |
 | `security-check` | Before exposing any endpoint to the internet |
 | `preflight-gate-check` | Before starting workspace generation (advanced flow) |
+| `wave-parallel-merge` | After parallel waves complete, before next phase |
 | `wave-handoff` | Before ending session mid-wave, or at wave completion |
 
 ## Memories (20)

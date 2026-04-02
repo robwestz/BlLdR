@@ -28,7 +28,8 @@ Do not proceed to implementation. Fix the gaps, re-review.
 **Who reviews:** qa-lead (or evaluator agent)
 
 ### Checklist
-- [ ] All wave exit criteria met (from wave file)
+- [ ] Every AC-ID in the wave's module spec is verified (PASS/FAIL in evaluation)
+- [ ] Zero BLOCKER findings in evaluator output
 - [ ] No console errors or warnings in production build
 - [ ] Error states handled (not just happy path)
 - [ ] Code follows SYSTEM.md standards
@@ -37,6 +38,7 @@ Do not proceed to implementation. Fix the gaps, re-review.
 - [ ] Responsive at 320px, 768px, 1024px (UI projects)
 - [ ] Contract interfaces match between modules
 - [ ] All new files have clear purpose (no orphans)
+- [ ] Evaluator feedback file exists at `qa/evaluations/<wave-id>.md`
 
 ### If FAIL
 Fix issues in current wave. Do not proceed to next wave.

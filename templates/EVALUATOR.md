@@ -54,15 +54,61 @@ For `tool` and `api` projects, review with these criteria:
 
 ## Output Contract
 
-Write evaluation feedback to `qa/evaluations/latest.md` or the wave-specific evaluation file if one exists.
+Write evaluation feedback to `qa/evaluations/<wave-id>.md` (e.g., `qa/evaluations/004-booking-calendar.md`).
+Also update `qa/evaluations/latest.md` as a copy of the most recent evaluation.
 
-Every evaluation must contain:
+### Structured Format (mandatory)
 
-1. Scope reviewed
-2. Summary judgment
-3. Findings grouped by severity
-4. Recommended next actions
-5. Whether browser-based validation was used
+Every evaluation MUST start with a YAML front-matter block followed by structured findings:
+
+```yaml
+---
+wave: "004-booking-calendar"
+module: "booking-calendar"
+verdict: PASS  # PASS or FAIL
+blocker_count: 0
+should_fix_count: 1
+nitpick_count: 2
+browser_validated: true  # false if no browser tools available
+---
+```
+
+### Findings Format
+
+After the front-matter, list findings referencing acceptance criterion IDs from the module spec:
+
+```
+## Acceptance Criteria Verification
+
+- AC-BOOKING_CALENDAR-01: PASS — Calendar renders with available dates highlighted
+- AC-BOOKING_CALENDAR-02: PASS — Unavailable dates grayed out and non-clickable
+- AC-BOOKING_CALENDAR-03: FAIL (SHOULD_FIX) — Date selection shows slots but no loading state
+- AC-BOOKING_CALENDAR-04: PASS — Full booking flow works end-to-end
+- AC-BOOKING_CALENDAR-05: PASS — Confirmation page renders with booking reference
+
+## Additional Findings
+
+- [BLOCKER] Description of blocking issue. File: path/to/file.tsx, Line: ~42
+- [SHOULD_FIX] Description. File: path/to/file.tsx
+- [NITPICK] Description.
+
+## Recommended Next Actions
+
+1. Add loading spinner to time slot grid (fixes AC-03)
+2. Consider adding keyboard navigation to calendar (NITPICK)
+
+## Summary
+
+Verdict: PASS (1 SHOULD_FIX, 2 NITPICK — no blockers)
+```
+
+### Rules for Findings
+
+- Every AC-ID from the module spec MUST appear in the verification list (PASS or FAIL)
+- Every FAIL must include a severity: BLOCKER, SHOULD_FIX, or NITPICK
+- Every BLOCKER or SHOULD_FIX must include a file path
+- Verdict is PASS only when blocker_count is 0
+- The builder can parse this format to determine: which criteria failed, what to fix, where
 
 ## Prohibitions
 

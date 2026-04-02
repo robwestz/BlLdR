@@ -503,10 +503,91 @@ class OnboardingEngine:
         return integrations
 
     def finalize(self) -> ProjectSpec:
-        """Run all derivations and return complete spec."""
+        """Run all derivations and return complete spec.
+
+        Derives feature flags from category and description keywords
+        BEFORE tech stack derivation, so the stack reflects all features.
+        """
+        self._derive_feature_flags()
         self.spec.tech_stack = self.derive_tech_stack()
         self.spec.external_integrations = self.derive_integrations()
         return self.spec
+
+    def _derive_feature_flags(self) -> None:
+        """Derive feature flags from category + description keywords.
+
+        Category-based rules are deterministic. Keyword-based rules scan
+        the description for high-confidence signals. This ensures that
+        minimal onboarding paths (e.g., from_description) still produce
+        correct feature flags.
+        """
+        spec = self.spec
+        desc = (spec.description or "").lower()
+
+        # Category-based derivations (deterministic)
+        if spec.category == ProjectCategory.BOOKING:
+            if not spec.has_booking:
+                spec.has_booking = True
+                spec.derivation_log.append("category=booking → has_booking=True")
+            if not spec.needs_database:
+                spec.needs_database = True
+                spec.derivation_log.append("category=booking → needs_database=True")
+            if not spec.needs_api:
+                spec.needs_api = True
+                spec.derivation_log.append("category=booking → needs_api=True")
+
+        if spec.category == ProjectCategory.E_COMMERCE:
+            if not spec.has_payment:
+                spec.has_payment = True
+                spec.derivation_log.append("category=e-commerce → has_payment=True")
+            if not spec.needs_database:
+                spec.needs_database = True
+                spec.derivation_log.append("category=e-commerce → needs_database=True")
+            if not spec.needs_api:
+                spec.needs_api = True
+                spec.derivation_log.append("category=e-commerce → needs_api=True")
+
+        if spec.category in (ProjectCategory.WEB_APP, ProjectCategory.SAAS):
+            if not spec.has_auth:
+                spec.has_auth = True
+                spec.derivation_log.append(f"category={spec.category.value} → has_auth=True")
+            if not spec.needs_database:
+                spec.needs_database = True
+                spec.derivation_log.append(f"category={spec.category.value} → needs_database=True")
+            if not spec.needs_api:
+                spec.needs_api = True
+                spec.derivation_log.append(f"category={spec.category.value} → needs_api=True")
+
+        if spec.category == ProjectCategory.API:
+            if not spec.needs_api:
+                spec.needs_api = True
+                spec.derivation_log.append("category=api → needs_api=True")
+
+        # Keyword-based derivations from description
+        payment_keywords = ("payment", "pay", "betala", "stripe", "checkout", "köp")
+        if any(kw in desc for kw in payment_keywords) and not spec.has_payment:
+            spec.has_payment = True
+            spec.derivation_log.append("description mentions payment → has_payment=True")
+
+        booking_keywords = ("booking", "boka", "reservation", "schedule", "appointment")
+        if any(kw in desc for kw in booking_keywords) and not spec.has_booking:
+            spec.has_booking = True
+            spec.derivation_log.append("description mentions booking → has_booking=True")
+
+        auth_keywords = ("login", "auth", "account", "konto", "register", "sign up")
+        if any(kw in desc for kw in auth_keywords) and not spec.has_auth:
+            spec.has_auth = True
+            spec.derivation_log.append("description mentions auth → has_auth=True")
+
+        contact_keywords = ("contact", "kontakt", "form", "formulär", "message")
+        if any(kw in desc for kw in contact_keywords) and not spec.has_contact:
+            spec.has_contact = True
+            spec.derivation_log.append("description mentions contact → has_contact=True")
+
+        search_keywords = ("search", "sök", "filter", "find")
+        if any(kw in desc for kw in search_keywords) and not spec.has_search:
+            spec.has_search = True
+            spec.derivation_log.append("description mentions search → has_search=True")
 
 
 # =============================================================================
@@ -1584,6 +1665,12 @@ class ScaffoldGenerator:
 
         # 10. Agent team (derived from category + modules)
         created.extend(self._generate_agent_team(out, blueprint))
+
+        # 11. Cross-vendor entry points
+        for entry_name in ("ENTRY-claude.md", "ENTRY-codex.md", "ENTRY-gemini.md"):
+            entry_template = self._read_template(entry_name)
+            if entry_template:
+                created.append(self._write(out / entry_name, entry_template))
 
         return created
 
@@ -2722,27 +2809,33 @@ Each evaluation should include:
 """
 
     def _render_evaluation_stub(self, bp: ProjectBlueprint) -> str:
-        return """# Latest Evaluation
+        first = min(bp.modules, key=lambda m: m.order)
+        wave_id = f"{first.order:03d}-{first.id}"
+        return f"""---
+wave: "{wave_id}"
+module: "{first.id}"
+verdict: PENDING
+blocker_count: 0
+should_fix_count: 0
+nitpick_count: 0
+browser_validated: false
+---
 
-## Scope Reviewed
+# Latest Evaluation
 
-_No evaluation yet._
+_No evaluation yet. This file will be updated after the first wave is reviewed._
 
-## Summary Judgment
+## Acceptance Criteria Verification
 
-_Pending._
+_Pending — run evaluator after completing wave {wave_id}._
 
-## Findings
+## Additional Findings
 
 - None yet.
 
 ## Recommended Next Actions
 
-- Complete the current wave and run evaluator review.
-
-## Browser Validation
-
-- Not run yet.
+- Complete wave {wave_id} and run evaluator review.
 """
 
     def _render_module(self, module: ModuleSpec, bp: ProjectBlueprint) -> str:

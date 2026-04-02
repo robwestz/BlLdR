@@ -121,6 +121,14 @@ SKILL_KEYWORDS: dict = {
     "health check": "logging-observability.md",
     "correlation": "logging-observability.md",
     "tracing": "logging-observability.md",
+    # --- Implementation & contracts (v2) ---
+    "implementation": "implementation-playbook.md",
+    "implement": "implementation-playbook.md",
+    "build module": "implementation-playbook.md",
+    "playbook": "implementation-playbook.md",
+    "contract": "contract-authoring.md",
+    "interface": "contract-authoring.md",
+    "handoff": "contract-authoring.md",
 }
 
 TIER_CONSTRAINTS = {

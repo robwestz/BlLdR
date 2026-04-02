@@ -21,13 +21,15 @@ Inget här ersätter v2-preflight-skillen. Det här **kopplar grundrepot** till 
 
 **Varför gamechanger:** Stänger gapet mellan “prompt säger godkänd” och **verifierbart** godkänd.
 
+**Status i repot (ingen duplicerad schema-fil):** `engines/preflight_validate.py` validerar mot `v2/skills/buildr-workspace-architect/references/preflight-handoff.schema.json`. Canonical pekare och policy: **`schemas/preflight/README.md`**.
+
 ---
 
 ## 2. Sammansättningskartor (vad preflight *driver* i workspace)
 
 | Förslag | Poäng |
 |--------|--------|
-| `docs/workspace-from-preflight.md` eller `templates/preflight/INGEST.md` | Tabell: vilket `PREFLIGHT_*`-fält → vilken genererad fil/sektion (t.ex. CRI → topp av `PROJECT.md`, acceptance → `qa/` eller `contracts/`, decisions → `state/orchestration.yaml`). |
+| `docs/workspace-from-preflight.md` eller `templates/preflight/INGEST.md` | Tabell: vilket `PREFLIGHT_*`-fält → vilken genererad fil/sektion (t.ex. CRI → topp av `PROJECT.md`, acceptance → `qa/` eller `contracts/`, decisions → `state/orchestration.yaml`). **Gjort:** `docs/workspace-from-preflight.md`. **Ej duplicerad:** `templates/preflight/README.md` pekar hit (ingen falsk second source). |
 | `catalog/preflight-bindings.json` (eller YAML) | Maskinläsbar: `purpose_claims` / kategori → vault skill-id, tier, modulhints — minskar att operator/vault-selector **improviserar bort** från preflight. |
 
 **Varför gamechanger:** Preflight blir **styrd kompositionsmotor**, inte bilaga.
@@ -50,7 +52,7 @@ Inget här ersätter v2-preflight-skillen. Det här **kopplar grundrepot** till 
 | Förslag | Poäng |
 |--------|--------|
 | `docs/v2-overview.md` (en sida: flöde, paths, install, v1 prompt-gate vs v2 kod-gate, länk `v2/start.md`, länk hit) | Nya sessioner hittar v2 och kör inte legacy-operator av vana. |
-| Uppdatera `README.md`, `MANIFEST.md`, `BUILDR_ARCHITECTURE.md` (sektion Preflight / v2) | Repo-“sanningskällor” stämmer med runtime. |
+| Uppdatera `README.md`, `MANIFEST.md`, `BUILDR_ARCHITECTURE.md` (sektion Preflight / v2) | Repo-“sanningskällor” stämmer med runtime. **Gjort:** dessa tre + `docs/v2-overview.md` + länkar till `BUILDR-purpose-and-layers.md` / `v2/start.md` där relevant. |
 
 **Varför gamechanger:** Minskar **två sanningar** mellan `skills/` och `v2/skills/`.
 
