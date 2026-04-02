@@ -2936,13 +2936,11 @@ Alla måste vara uppfyllda innan modulen anses klar:
 
 ## Implementation
 
-1. Läs SYSTEM.md §Design innan du implementerar visuella element.
-2. Läs SYSTEM.md §Kodstandard innan du skriver kod.
-3. Skapa filerna ovan i ordning.
-4. Implementera komponenterna med angivna props.
-5. Implementera användarflödet steg för steg.
-6. Verifiera varje acceptanskriterium (markera med [x]).
-7. Kör QA. Rapportera.
+Follow the step-by-step flow above exactly. Then:
+1. Verify each acceptance criterion (mark with [x] when passing).
+2. Run QA (qa/checklist.md for this module).
+3. Update state/orchestration.yaml.
+4. Report completion.
 
 ---
 

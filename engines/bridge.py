@@ -917,13 +917,62 @@ class PreflightIngestor:
             vault_items_used = []
             enrichment_source = "preflight"
 
-            # --- Priority 1: sub_components → implementation steps ---
-            if component:
-                sub_comps = component.get("sub_components", [])
-                for j, sub in enumerate(sub_comps, 1):
-                    impl_steps.append(f"{j}. Set up: {sub}")
+            # --- Step 1: Find matching vault skill by name overlap ---
+            # Vault skills contain the EXACT commands. We bake them
+            # directly into the module — no separate file to find.
+            vault_steps = []
+            if select_for_wave:
+                intent = f"{module.name} {module.description}"
+                selection = select_for_wave(
+                    intent=intent, tier="B", category="", stack="",
+                )
+                module_words = set(
+                    w for w in module.id.lower().replace(".", "").split("-")
+                    if len(w) > 2
+                )
+                for skill_path_str in selection.get("skills", []):
+                    skill_path = Path(skill_path_str)
+                    if not skill_path.exists():
+                        continue
+                    skill_name = skill_path.stem.lower()
+                    skill_words = set(
+                        w for w in skill_name.split("-") if len(w) > 2
+                    )
+                    # Must have word overlap with module name
+                    if not (module_words & skill_words):
+                        continue
+                    # Extract steps from the "## Steps" section
+                    content = skill_path.read_text(encoding="utf-8")
+                    vault_items_used.append(skill_path.name)
+                    in_steps = False
+                    for line in content.split("\n"):
+                        stripped = line.strip()
+                        if stripped == "## Steps":
+                            in_steps = True
+                            continue
+                        if in_steps and stripped.startswith("## "):
+                            break
+                        if in_steps and stripped and len(stripped) > 5:
+                            vault_steps.append(stripped)
 
-            # --- Priority 2: acceptance pass_conditions → verification ---
+            # --- Step 2: Build implementation steps (vault > sub-components > fallback) ---
+            if vault_steps:
+                impl_steps = vault_steps
+                enrichment_source = "vault_skill"
+            elif component and component.get("sub_components"):
+                for j, sub in enumerate(component["sub_components"], 1):
+                    impl_steps.append(f"{j}. {sub}")
+                enrichment_source = "preflight_sub_components"
+            else:
+                desc = component.get("justification", module.description) if component else module.description
+                impl_steps = [
+                    f"1. Research exact setup steps for {module.name}",
+                    f"2. Execute: {desc}",
+                    f"3. Verify per acceptance criteria below",
+                ]
+                enrichment_source = "fallback"
+
+            # --- Step 3: Extract verification from acceptance criteria ---
             for ac in module.acceptance_criteria:
                 if "(pass:" not in ac:
                     continue
@@ -935,55 +984,19 @@ class PreflightIngestor:
                         import ast
                         steps = ast.literal_eval(pass_text)
                         if isinstance(steps, list):
-                            for s in steps:
-                                verification.append(str(s))
+                            verification.extend(str(s) for s in steps)
                     else:
                         verification.append(pass_text)
                 except (ValueError, SyntaxError):
                     pass
 
-            # --- Priority 3: vault skills (ONLY if task-type relevant) ---
-            if len(impl_steps) < 3 and select_for_wave:
-                task_type = self._classify_task_type(
-                    f"{module.name} {module.description}"
-                )
-                intent = f"{module.name} {module.description}"
-                selection = select_for_wave(
-                    intent=intent, tier="B", category="", stack="",
-                )
-                for skill_path_str in selection.get("skills", []):
-                    skill_path = Path(skill_path_str)
-                    if not skill_path.exists():
-                        continue
-                    if not self._vault_skill_is_relevant(skill_path, task_type):
-                        continue
-                    content = skill_path.read_text(encoding="utf-8")
-                    vault_items_used.append(skill_path.name)
-                    for line in content.split("\n"):
-                        stripped = line.strip()
-                        if (stripped and stripped[0].isdigit()
-                                and ". " in stripped and len(stripped) > 10):
-                            impl_steps.append(stripped)
-                    if len(impl_steps) >= 8:
-                        break
-                if vault_items_used:
-                    enrichment_source = "vault"
-
-            # --- Priority 4: generic fallback (only if still < 3) ---
-            if len(impl_steps) < 3:
-                impl_steps.extend([
-                    f"1. Research: determine exact steps for {module.name}",
-                    f"2. Implement: execute setup following documentation",
-                    f"3. Verify: confirm {module.name} works per acceptance criteria",
-                ])
-                enrichment_source = "fallback"
-
-            # Apply to module
+            # --- Step 4: Compose final module user_flows ---
             module.user_flows = impl_steps
             if verification:
-                module.user_flows.extend(
-                    [f"VERIFY: {v}" for v in verification]
-                )
+                module.user_flows.append("")
+                module.user_flows.append("VERIFICATION:")
+                for v in verification:
+                    module.user_flows.append(f"  - {v}")
 
             enrichment_data.append({
                 "component_id": comp_id,
