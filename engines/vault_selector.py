@@ -140,6 +140,24 @@ SKILL_KEYWORDS: dict = {
     "service": "component-enrichment.md",
     "infrastructure": "component-enrichment.md",
     "platform": "component-enrichment.md",
+    # --- Infrastructure / macOS / networking ---
+    "macos": "macos-user-isolation.md",
+    "user account": "macos-user-isolation.md",
+    "user isolation": "macos-user-isolation.md",
+    "standard user": "macos-user-isolation.md",
+    "tailscale": "tailscale-mesh-setup.md",
+    "mesh": "tailscale-mesh-setup.md",
+    "vpn": "tailscale-mesh-setup.md",
+    "remote access": "tailscale-mesh-setup.md",
+    "launchd": "launchd-daemon.md",
+    "daemon": "launchd-daemon.md",
+    "background service": "launchd-daemon.md",
+    "systemd": "launchd-daemon.md",
+    "auto-start": "launchd-daemon.md",
+    "icloud": "icloud-workspace-sync.md",
+    "cloud sync": "icloud-workspace-sync.md",
+    "cloud storage": "icloud-workspace-sync.md",
+    "workspace sync": "icloud-workspace-sync.md",
 }
 
 TIER_CONSTRAINTS = {

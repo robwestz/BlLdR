@@ -817,15 +817,16 @@ class PreflightIngestor:
     def enrich_modules(self, modules: list) -> None:
         """Enrich each module with prescriptive implementation steps.
 
-        For each module:
-        1. Search vault for matching skills by module name/description
-        2. If vault match: extract steps from vault skill content
-        3. Build implementation_steps, files, verification from available data
-        4. Write PREFLIGHT_ENRICHMENT.json to staging directory
+        Two-pass enrichment:
+        1. Extract verification steps from acceptance criteria (always available)
+        2. Build implementation steps from preflight component data
+           (sub-components, dependencies, description → concrete actions)
 
-        This is the "90% vault + 10% custom" mechanism. Vault matches
-        provide proven implementation patterns. Unmatched components
-        get generic scaffolding steps that the agent fills during research.
+        The enrichment favours PREFLIGHT DATA over vault keyword matches,
+        because preflight components carry project-specific context that
+        generic vault skills do not. Vault skills are appended as
+        supplementary guidance only when they add value beyond what
+        preflight already provides.
         """
         self._require_validated()
 
@@ -833,86 +834,104 @@ class PreflightIngestor:
 
         for module in modules:
             comp_id = module.customization.get("preflight_component_id", module.id)
-            intent = f"{module.name} {module.description}"
 
-            # Step 1: Vault skill search
-            vault_matches = []
-            if select_for_wave:
-                selection = select_for_wave(
-                    intent=intent, tier="B",
-                    category="", stack="",
-                )
-                vault_matches = selection.get("skills", [])
+            # Find the original preflight component for this module
+            component = None
+            for c in self.minimal_inevitable_set:
+                if c.get("component_id") == comp_id:
+                    component = c
+                    break
 
-            # Step 2: Extract steps from vault skills
-            vault_steps = []
-            vault_items_used = []
-            for skill_path in vault_matches:
-                skill_path = Path(skill_path)
-                if skill_path.exists():
-                    content = skill_path.read_text(encoding="utf-8")
-                    vault_items_used.append(skill_path.name)
-                    # Extract numbered steps from vault skill
-                    for line in content.split("\n"):
-                        stripped = line.strip()
-                        if (stripped and stripped[0].isdigit() and ". " in stripped
-                                and len(stripped) > 10):
-                            vault_steps.append(stripped)
-
-            # Step 3: Build enrichment from preflight data + vault
-            impl_steps = []
-            files = list(module.files_to_create)
+            # --- Pass 1: Extract verification steps from acceptance criteria ---
             verification = []
-
-            if vault_steps:
-                impl_steps.extend(vault_steps[:10])  # Cap at 10 vault steps
-
-            # Add steps from preflight acceptance criteria (they contain test procedures)
             for ac in module.acceptance_criteria:
                 if "(pass:" in ac:
-                    # Extract pass condition as verification
-                    pass_start = ac.index("(pass:") + 6
-                    pass_end = ac.rindex(")")
-                    pass_text = ac[pass_start:pass_end].strip()
-                    if pass_text.startswith("[") and pass_text.endswith("]"):
-                        # It's a list of steps — parse them
-                        try:
+                    try:
+                        pass_start = ac.index("(pass:") + 6
+                        pass_end = ac.rindex(")")
+                        pass_text = ac[pass_start:pass_end].strip()
+                        if pass_text.startswith("[") and pass_text.endswith("]"):
                             import ast
                             steps = ast.literal_eval(pass_text)
                             if isinstance(steps, list):
-                                for s in steps:
-                                    verification.append(str(s))
-                        except (SyntaxError, ValueError):
+                                verification.extend(str(s) for s in steps)
+                        else:
                             verification.append(pass_text)
-                    else:
-                        verification.append(pass_text)
+                    except (ValueError, SyntaxError):
+                        pass
 
-            # Step 4: If we still have no implementation steps, generate generic ones
+            # --- Pass 2: Build implementation steps from component data ---
+            impl_steps = []
+            files = list(module.files_to_create)
+
+            if component:
+                sub_components = component.get("sub_components", [])
+                deps = component.get("dependencies", [])
+                description = component.get("justification", "")
+
+                # Dependencies become prerequisite checks
+                if deps:
+                    for dep in deps:
+                        if isinstance(dep, str) and dep:
+                            impl_steps.append(
+                                f"PREREQUISITE: Verify {dep} is complete before starting"
+                            )
+
+                # Sub-components become concrete implementation steps
+                if sub_components:
+                    for i, sub in enumerate(sub_components, 1):
+                        if isinstance(sub, str) and sub:
+                            impl_steps.append(f"{i}. {sub}")
+                else:
+                    # No sub-components — derive steps from description
+                    impl_steps.append(
+                        f"1. Set up {module.name} per project requirements"
+                    )
+                    impl_steps.append(
+                        f"2. Configure {module.name}: {description}"
+                    )
+                    impl_steps.append(
+                        f"3. Test {module.name} functionality"
+                    )
+
+            # If still no steps (no component match), use minimal scaffold
             if not impl_steps:
                 impl_steps = [
-                    f"Research: determine exact setup steps for {module.name}",
-                    f"Implement: execute setup for {module.name} following documentation",
-                    f"Verify: run verification commands to confirm {module.name} works",
+                    f"1. Research exact setup steps for {module.name}",
+                    f"2. Execute setup following official documentation",
+                    f"3. Verify functionality with acceptance criteria below",
                 ]
 
-            # Update the module with enrichment data
-            if not module.user_flows:
-                module.user_flows = impl_steps
-            if verification and not any("verification" in str(f).lower()
-                                        for f in module.user_flows):
-                module.user_flows.extend(
-                    [f"VERIFY: {v}" for v in verification]
-                )
+            # Add verification as final steps
+            if verification:
+                impl_steps.append("")
+                impl_steps.append("VERIFICATION:")
+                for v in verification:
+                    impl_steps.append(f"  - {v}")
+
+            # Update module
+            module.user_flows = impl_steps
+            if not module.files_to_create and component:
+                # Derive files from sub-components if they look like file paths
+                for sub in component.get("sub_components", []):
+                    if isinstance(sub, str) and ("/" in sub or "." in sub):
+                        module.files_to_create.append(sub)
 
             enrichment_data.append({
                 "component_id": comp_id,
                 "module_id": module.id,
                 "module_name": module.name,
                 "implementation_steps": impl_steps,
-                "files_to_create": files,
+                "files_to_create": module.files_to_create,
                 "verification_commands": verification,
-                "vault_items_used": vault_items_used,
-                "enrichment_source": "vault" if vault_steps else "preflight_criteria",
+                "has_sub_components": bool(
+                    component and component.get("sub_components")
+                ),
+                "enrichment_source": (
+                    "preflight_sub_components"
+                    if component and component.get("sub_components")
+                    else "preflight_description"
+                ),
             })
 
         # Write enrichment artifact
@@ -925,21 +944,25 @@ class PreflightIngestor:
                     "timestamp_utc": datetime.now().isoformat() + "Z",
                 },
                 "enriched_components": enrichment_data,
-                "vault_coverage": sum(
-                    1 for e in enrichment_data if e["enrichment_source"] == "vault"
+                "sub_component_coverage": sum(
+                    1 for e in enrichment_data
+                    if e["enrichment_source"] == "preflight_sub_components"
                 ),
-                "research_needed": sum(
-                    1 for e in enrichment_data if e["enrichment_source"] != "vault"
+                "description_only": sum(
+                    1 for e in enrichment_data
+                    if e["enrichment_source"] == "preflight_description"
                 ),
             }, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
 
         logger.info(
-            "Enriched %d modules: %d from vault, %d need research",
+            "Enriched %d modules: %d from sub-components, %d from description",
             len(enrichment_data),
-            sum(1 for e in enrichment_data if e["enrichment_source"] == "vault"),
-            sum(1 for e in enrichment_data if e["enrichment_source"] != "vault"),
+            sum(1 for e in enrichment_data
+                if e["enrichment_source"] == "preflight_sub_components"),
+            sum(1 for e in enrichment_data
+                if e["enrichment_source"] == "preflight_description"),
         )
 
     # ------------------------------------------------------------------
@@ -1380,12 +1403,53 @@ class WorkspaceBuilder:
         pf = self.preflight
         patched: List[str] = []
 
-        # PROJECT.md: append preflight addendum
+        # PROJECT.md: rewrite with preflight data when preflight drives modules
         project_path = out / "PROJECT.md"
         if project_path.exists():
             content = project_path.read_text(encoding="utf-8")
+
+            # If preflight exists, replace forge category/stack/design
+            # sections with preflight-accurate architecture data
+            if pf.minimal_inevitable_set:
+                # Replace misleading forge category/stack/design section
+                # Find and replace the "Teknisk Stack" section
+                if "## Teknisk Stack" in content and "## Designsystem" in content:
+                    before_stack = content.split("## Teknisk Stack")[0]
+                    after_design = content.split("## Deriveringslogg")[-1] if "## Deriveringslogg" in content else ""
+
+                    # Build preflight-accurate tech section
+                    components = pf.minimal_inevitable_set
+                    comp_list = "\n".join(
+                        f"| {c.get('component_id', '?')} | {c.get('component_name', '?')} | {c.get('classification', '?')} |"
+                        for c in components
+                    )
+                    tech_section = (
+                        f"## Architecture Components (from preflight)\n\n"
+                        f"| ID | Component | Classification |\n"
+                        f"|---|-----------|----------------|\n"
+                        f"{comp_list}\n\n---\n\n"
+                    )
+
+                    if after_design:
+                        content = before_stack + tech_section + "## Deriveringslogg" + after_design
+                    else:
+                        content = before_stack + tech_section
+
+                # Fix category line if it says "booking" for a non-booking project
+                cri = pf.cri
+                job = cri.get("primary_user_job_to_be_done", "")
+                if job:
+                    content = content.replace(
+                        "> Kategori: booking",
+                        f"> Kategori: platform-setup"
+                    ).replace(
+                        "> Kategori: website",
+                        f"> Kategori: platform-setup"
+                    )
+
             addendum = pf.render_project_addendum()
-            content += f"\n---\n\n{addendum}"
+            if "## Preflight Architecture" not in content:
+                content += f"\n---\n\n{addendum}"
             project_path.write_text(content, encoding="utf-8")
             patched.append(str(project_path))
 

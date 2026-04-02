@@ -3,7 +3,7 @@
 Quick reference for all available building blocks.
 Each item is self-contained and project-agnostic.
 
-## Skills (36)
+## Skills (40)
 
 | File | Domain |
 |------|--------|
@@ -27,9 +27,12 @@ Each item is self-contained and project-agnostic.
 | `file-upload` | Upload flow, type validation, storage |
 | `form-validation` | User input, forms |
 | `i18n` | Multi-language support |
+| `icloud-workspace-sync` | iCloud Drive as cloud-synced workspace storage |
+| `launchd-daemon` | Persistent background service on macOS (auto-start, auto-restart) |
 | `implementation-playbook` | Module spec → working code step by step |
 | `contract-authoring` | Interface contracts between modules |
 | `logging-observability` | Structured logging, correlation IDs, health checks |
+| `macos-user-isolation` | Dedicated macOS user for service/agent isolation |
 | `input-sanitization` | Sanitize user input before storage or display |
 | `modal-dialog` | Focus trap, keyboard nav, scroll lock |
 | `notification-system` | Toast/snackbar: timing, types, accessibility |
@@ -42,6 +45,7 @@ Each item is self-contained and project-agnostic.
 | `search-filter` | Client/server search, debounce, URL-persisted state |
 | `seo` | Search engine optimization |
 | `state-design` | Where state lives |
+| `tailscale-mesh-setup` | Zero-config mesh networking between devices |
 | `testing-strategy` | What and how to test |
 
 ## Constraints (16)
