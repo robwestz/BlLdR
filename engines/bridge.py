@@ -814,19 +814,89 @@ class PreflightIngestor:
     # Component Enrichment: vault-first, then research-driven
     # ------------------------------------------------------------------
 
+    # Task type classification for vault relevance filtering
+    INFRASTRUCTURE_SIGNALS = frozenset([
+        "install", "setup", "configure", "create user", "daemon", "service",
+        "launchd", "systemd", "homebrew", "brew", "npm install", "deploy",
+        "firewall", "permissions", "keychain", "sync", "symlink", "ssh",
+        "tailscale", "vpn", "remote", "account", "user isolation",
+    ])
+    API_DESIGN_SIGNALS = frozenset([
+        "endpoint", "route", "handler", "rest api design", "http method",
+        "request body", "response body", "status code",
+    ])
+    FRONTEND_SIGNALS = frozenset([
+        "component", "page", "form", "ui", "layout", "responsive", "css",
+        "react", "button", "modal", "navigation",
+    ])
+
+    def _classify_task_type(self, description: str) -> str:
+        """Classify a component's task type from its description."""
+        desc_lower = description.lower()
+        infra_score = sum(1 for s in self.INFRASTRUCTURE_SIGNALS if s in desc_lower)
+        api_score = sum(1 for s in self.API_DESIGN_SIGNALS if s in desc_lower)
+        frontend_score = sum(1 for s in self.FRONTEND_SIGNALS if s in desc_lower)
+
+        if infra_score >= api_score and infra_score >= frontend_score:
+            return "infrastructure"
+        if api_score > frontend_score:
+            return "api-design"
+        return "frontend"
+
+    def _vault_skill_is_relevant(self, skill_path: Path, task_type: str) -> bool:
+        """Check if a vault skill is relevant to the given task type."""
+        name = skill_path.stem.lower()
+
+        # Skills that are ALWAYS relevant regardless of task type
+        always_relevant = {
+            "component-enrichment", "implementation-playbook",
+            "contract-authoring", "environment-config", "deploy-checklist",
+            "error-handling", "testing-strategy",
+        }
+        if name in always_relevant:
+            return True
+
+        # Infrastructure-specific skills
+        infra_skills = {
+            "macos-user-isolation", "launchd-daemon", "tailscale-mesh-setup",
+            "icloud-workspace-sync",
+        }
+        if task_type == "infrastructure" and name in infra_skills:
+            return True
+
+        # API design skills — only relevant for api-design tasks
+        api_only = {
+            "api-design", "data-modeling", "database-schema", "pagination",
+            "search-filter", "data-fetch",
+        }
+        if name in api_only:
+            return task_type == "api-design"
+
+        # Frontend skills — only relevant for frontend tasks
+        frontend_only = {
+            "component-creation", "component-arch", "responsive-layout",
+            "form-validation", "modal-dialog", "dark-mode", "drag-drop",
+            "notification-system", "error-boundary",
+        }
+        if name in frontend_only:
+            return task_type == "frontend"
+
+        # Default: relevant if not in any exclusion set
+        return name not in api_only and name not in frontend_only
+
     def enrich_modules(self, modules: list) -> None:
         """Enrich each module with prescriptive implementation steps.
 
-        Two-pass enrichment:
-        1. Extract verification steps from acceptance criteria (always available)
-        2. Build implementation steps from preflight component data
-           (sub-components, dependencies, description → concrete actions)
+        Priority order (Ändring A from plan):
+        1. Preflight sub_components → implementation steps (primary source)
+        2. Preflight acceptance pass_conditions → verification steps
+        3. Vault skills matching component's TASK TYPE (not just keywords)
+        4. Generic fallback ONLY if 1-3 give < 3 steps
 
-        The enrichment favours PREFLIGHT DATA over vault keyword matches,
-        because preflight components carry project-specific context that
-        generic vault skills do not. Vault skills are appended as
-        supplementary guidance only when they add value beyond what
-        preflight already provides.
+        Vault relevance filtering (Ändring B from plan):
+        - Classify each component's task type (infrastructure/api/frontend)
+        - Only include vault skills whose domain matches the task type
+        - api-design.md does NOT match infrastructure components
         """
         self._require_validated()
 
@@ -835,103 +905,94 @@ class PreflightIngestor:
         for module in modules:
             comp_id = module.customization.get("preflight_component_id", module.id)
 
-            # Find the original preflight component for this module
+            # Find the original preflight component
             component = None
             for c in self.minimal_inevitable_set:
                 if c.get("component_id") == comp_id:
                     component = c
                     break
 
-            # --- Pass 1: Extract verification steps from acceptance criteria ---
-            verification = []
-            for ac in module.acceptance_criteria:
-                if "(pass:" in ac:
-                    try:
-                        pass_start = ac.index("(pass:") + 6
-                        pass_end = ac.rindex(")")
-                        pass_text = ac[pass_start:pass_end].strip()
-                        if pass_text.startswith("[") and pass_text.endswith("]"):
-                            import ast
-                            steps = ast.literal_eval(pass_text)
-                            if isinstance(steps, list):
-                                verification.extend(str(s) for s in steps)
-                        else:
-                            verification.append(pass_text)
-                    except (ValueError, SyntaxError):
-                        pass
-
-            # --- Pass 2: Build implementation steps from component data ---
             impl_steps = []
-            files = list(module.files_to_create)
+            verification = []
+            vault_items_used = []
+            enrichment_source = "preflight"
 
+            # --- Priority 1: sub_components → implementation steps ---
             if component:
-                sub_components = component.get("sub_components", [])
-                deps = component.get("dependencies", [])
-                description = component.get("justification", "")
+                sub_comps = component.get("sub_components", [])
+                for j, sub in enumerate(sub_comps, 1):
+                    impl_steps.append(f"{j}. Set up: {sub}")
 
-                # Dependencies become prerequisite checks
-                if deps:
-                    for dep in deps:
-                        if isinstance(dep, str) and dep:
-                            impl_steps.append(
-                                f"PREREQUISITE: Verify {dep} is complete before starting"
-                            )
+            # --- Priority 2: acceptance pass_conditions → verification ---
+            for ac in module.acceptance_criteria:
+                if "(pass:" not in ac:
+                    continue
+                try:
+                    pass_start = ac.index("(pass:") + 6
+                    pass_end = ac.rindex(")")
+                    pass_text = ac[pass_start:pass_end].strip()
+                    if pass_text.startswith("[") and pass_text.endswith("]"):
+                        import ast
+                        steps = ast.literal_eval(pass_text)
+                        if isinstance(steps, list):
+                            for s in steps:
+                                verification.append(str(s))
+                    else:
+                        verification.append(pass_text)
+                except (ValueError, SyntaxError):
+                    pass
 
-                # Sub-components become concrete implementation steps
-                if sub_components:
-                    for i, sub in enumerate(sub_components, 1):
-                        if isinstance(sub, str) and sub:
-                            impl_steps.append(f"{i}. {sub}")
-                else:
-                    # No sub-components — derive steps from description
-                    impl_steps.append(
-                        f"1. Set up {module.name} per project requirements"
-                    )
-                    impl_steps.append(
-                        f"2. Configure {module.name}: {description}"
-                    )
-                    impl_steps.append(
-                        f"3. Test {module.name} functionality"
-                    )
+            # --- Priority 3: vault skills (ONLY if task-type relevant) ---
+            if len(impl_steps) < 3 and select_for_wave:
+                task_type = self._classify_task_type(
+                    f"{module.name} {module.description}"
+                )
+                intent = f"{module.name} {module.description}"
+                selection = select_for_wave(
+                    intent=intent, tier="B", category="", stack="",
+                )
+                for skill_path_str in selection.get("skills", []):
+                    skill_path = Path(skill_path_str)
+                    if not skill_path.exists():
+                        continue
+                    if not self._vault_skill_is_relevant(skill_path, task_type):
+                        continue
+                    content = skill_path.read_text(encoding="utf-8")
+                    vault_items_used.append(skill_path.name)
+                    for line in content.split("\n"):
+                        stripped = line.strip()
+                        if (stripped and stripped[0].isdigit()
+                                and ". " in stripped and len(stripped) > 10):
+                            impl_steps.append(stripped)
+                    if len(impl_steps) >= 8:
+                        break
+                if vault_items_used:
+                    enrichment_source = "vault"
 
-            # If still no steps (no component match), use minimal scaffold
-            if not impl_steps:
-                impl_steps = [
-                    f"1. Research exact setup steps for {module.name}",
-                    f"2. Execute setup following official documentation",
-                    f"3. Verify functionality with acceptance criteria below",
-                ]
+            # --- Priority 4: generic fallback (only if still < 3) ---
+            if len(impl_steps) < 3:
+                impl_steps.extend([
+                    f"1. Research: determine exact steps for {module.name}",
+                    f"2. Implement: execute setup following documentation",
+                    f"3. Verify: confirm {module.name} works per acceptance criteria",
+                ])
+                enrichment_source = "fallback"
 
-            # Add verification as final steps
-            if verification:
-                impl_steps.append("")
-                impl_steps.append("VERIFICATION:")
-                for v in verification:
-                    impl_steps.append(f"  - {v}")
-
-            # Update module
+            # Apply to module
             module.user_flows = impl_steps
-            if not module.files_to_create and component:
-                # Derive files from sub-components if they look like file paths
-                for sub in component.get("sub_components", []):
-                    if isinstance(sub, str) and ("/" in sub or "." in sub):
-                        module.files_to_create.append(sub)
+            if verification:
+                module.user_flows.extend(
+                    [f"VERIFY: {v}" for v in verification]
+                )
 
             enrichment_data.append({
                 "component_id": comp_id,
                 "module_id": module.id,
                 "module_name": module.name,
-                "implementation_steps": impl_steps,
-                "files_to_create": module.files_to_create,
-                "verification_commands": verification,
-                "has_sub_components": bool(
-                    component and component.get("sub_components")
-                ),
-                "enrichment_source": (
-                    "preflight_sub_components"
-                    if component and component.get("sub_components")
-                    else "preflight_description"
-                ),
+                "implementation_steps": len(impl_steps),
+                "verification_steps": len(verification),
+                "vault_items_used": vault_items_used,
+                "enrichment_source": enrichment_source,
             })
 
         # Write enrichment artifact
@@ -944,25 +1005,28 @@ class PreflightIngestor:
                     "timestamp_utc": datetime.now().isoformat() + "Z",
                 },
                 "enriched_components": enrichment_data,
-                "sub_component_coverage": sum(
+                "preflight_primary": sum(
                     1 for e in enrichment_data
-                    if e["enrichment_source"] == "preflight_sub_components"
+                    if e["enrichment_source"] == "preflight"
                 ),
-                "description_only": sum(
+                "vault_supplemented": sum(
                     1 for e in enrichment_data
-                    if e["enrichment_source"] == "preflight_description"
+                    if e["enrichment_source"] == "vault"
+                ),
+                "fallback": sum(
+                    1 for e in enrichment_data
+                    if e["enrichment_source"] == "fallback"
                 ),
             }, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
 
         logger.info(
-            "Enriched %d modules: %d from sub-components, %d from description",
+            "Enriched %d modules: %d from preflight, %d vault-supplemented, %d fallback",
             len(enrichment_data),
-            sum(1 for e in enrichment_data
-                if e["enrichment_source"] == "preflight_sub_components"),
-            sum(1 for e in enrichment_data
-                if e["enrichment_source"] == "preflight_description"),
+            sum(1 for e in enrichment_data if e["enrichment_source"] == "preflight"),
+            sum(1 for e in enrichment_data if e["enrichment_source"] == "vault"),
+            sum(1 for e in enrichment_data if e["enrichment_source"] == "fallback"),
         )
 
     # ------------------------------------------------------------------
@@ -1435,17 +1499,23 @@ class WorkspaceBuilder:
                     else:
                         content = before_stack + tech_section
 
-                # Fix category line if it says "booking" for a non-booking project
-                cri = pf.cri
-                job = cri.get("primary_user_job_to_be_done", "")
-                if job:
+                # Fix category line — use "preflight-driven" instead of forge category
+                for old_cat in ("booking", "website", "web-app", "e-commerce",
+                                "saas", "tool", "api", "custom"):
                     content = content.replace(
-                        "> Kategori: booking",
-                        f"> Kategori: platform-setup"
-                    ).replace(
-                        "> Kategori: website",
-                        f"> Kategori: platform-setup"
+                        f"> Kategori: {old_cat}",
+                        "> Kategori: preflight-driven"
                     )
+
+                # Remove forge derivation lines that reference wrong category
+                cleaned_lines = []
+                for line in content.split("\n"):
+                    # Keep CRI constraint lines, remove forge category derivations
+                    if line.startswith("- category=") or line.startswith("- description mentions"):
+                        if "CRI constraint" not in line:
+                            continue
+                    cleaned_lines.append(line)
+                content = "\n".join(cleaned_lines)
 
             addendum = pf.render_project_addendum()
             if "## Preflight Architecture" not in content:
