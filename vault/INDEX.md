@@ -3,7 +3,7 @@
 Quick reference for all available building blocks.
 Each item is self-contained and project-agnostic.
 
-## Skills (35)
+## Skills (36)
 
 | File | Domain |
 |------|--------|
@@ -12,6 +12,7 @@ Each item is self-contained and project-agnostic.
 | `auth-patterns` | Login, registration, sessions |
 | `code-review` | Code quality review, systematic pass |
 | `component-arch` | UI component architecture, composition |
+| `component-enrichment` | Fill preflight components with implementation steps (vault-first, then research) |
 | `component-creation` | React/UI components |
 | `dark-mode` | Theme switching, CSS variables, persistence |
 | `data-fetch` | Remote data, loading/error/empty states, caching |

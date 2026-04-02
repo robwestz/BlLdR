@@ -129,6 +129,17 @@ SKILL_KEYWORDS: dict = {
     "contract": "contract-authoring.md",
     "interface": "contract-authoring.md",
     "handoff": "contract-authoring.md",
+    # --- Component enrichment ---
+    "enrich": "component-enrichment.md",
+    "enrichment": "component-enrichment.md",
+    "research component": "component-enrichment.md",
+    "setup": ["component-enrichment.md", "environment-config.md"],
+    "install": ["component-enrichment.md", "deploy-checklist.md"],
+    "configure": ["component-enrichment.md", "environment-config.md"],
+    "daemon": "component-enrichment.md",
+    "service": "component-enrichment.md",
+    "infrastructure": "component-enrichment.md",
+    "platform": "component-enrichment.md",
 }
 
 TIER_CONSTRAINTS = {
