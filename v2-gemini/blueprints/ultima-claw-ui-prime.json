@@ -1,0 +1,50 @@
+{
+  "blueprint_id": "ultima-claw-ui-prime",
+  "name": "Ultima-Claw UI Prime (Cognitive Control Center)",
+  "target_market_value_sek": 450000,
+  "category": "web-app",
+  "tech_stack": "nextjs",
+  "description": "The definitive interface for Ultima-Claw memory systems. Visualizes cognitive consolidation, identity drift, and context budgeting with high-fidelity editorial design.",
+  "traits": [
+    "memory-visualizer",
+    "identity-guardian",
+    "context-negotiator",
+    "engine-orchestrator",
+    "discovery-distiller"
+  ],
+  "core_modules": [
+    "foundation",
+    "design-system-editorial",
+    "auth-internal",
+    "memory-continuum-dashboard",
+    "identity-drift-monitor",
+    "context-budget-panel",
+    "project-spawner-ui"
+  ],
+  "forced_constraints": {
+    "typography": {
+      "heading": "Source Serif 4",
+      "body": "Outfit"
+    },
+    "colors": {
+      "background": "#F7F5F0",
+      "sidebar": "#1B1B2F",
+      "accent": "#D4A853"
+    },
+    "layout": "editorial-bento-grid"
+  },
+  "preflight_presets": {
+    "CRI": {
+      "target_users": "Power users and AI orchestrators requiring deep cognitive transparency",
+      "business_outcome": "Zero-friction management of multi-engine LLM identities and long-term memory",
+      "monetization": "Enterprise License / High-tier SaaS",
+      "kill_switch": "Identity consensus failure or critical memory corruption"
+    },
+    "acceptance_criteria": [
+      "AC-COGNITION-01: Real-time visualization of the 5 memory stages (Encoding to Identity-Filtered Recall)",
+      "AC-IDENTITY-01: Visual indicator of 'Identity Drift' per engine (Claude vs Gemini vs Codex)",
+      "AC-BUDGET-01: Dynamic context budgeter showing Hot/Warm/Cold tier distribution",
+      "AC-UX-01: Editorial-grade aesthetics with smooth transitions and high-density information display"
+    ]
+  }
+}

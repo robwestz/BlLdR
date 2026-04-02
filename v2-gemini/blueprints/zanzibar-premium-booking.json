@@ -1,0 +1,39 @@
+{
+  "blueprint_id": "zanzibar-premium-booking",
+  "name": "Zanzibar Premium Booking Engine",
+  "target_market_value_sek": 250000,
+  "category": "booking",
+  "tech_stack": "nextjs",
+  "description": "High-ticket booking engine for luxury tourism, fishing trips, and excursions. Includes multilingual support, WhatsApp integration, and international payments.",
+  "core_modules": [
+    "foundation",
+    "design-system",
+    "booking-catalog",
+    "booking-calendar",
+    "payment",
+    "multilingual",
+    "whatsapp",
+    "seo",
+    "dashboard"
+  ],
+  "forced_constraints": {
+    "languages": ["en", "sv", "sw"],
+    "payment_methods": ["stripe", "mobile-money"],
+    "audience_device": "mobile-first",
+    "feeling": "luxury"
+  },
+  "preflight_presets": {
+    "CRI": {
+      "target_users": "International luxury travelers and local operators",
+      "business_outcome": "Automated high-ticket reservations with instant payment and WhatsApp confirmation",
+      "monetization": "Commission per booking + platform fee",
+      "kill_switch": "Payment API failure or critical availability drift"
+    },
+    "acceptance_criteria": [
+      "AC-BOOKING-01: User can select date/time and pay in under 3 minutes on mobile",
+      "AC-INT-01: Automated WhatsApp confirmation sent to both guest and operator after payment",
+      "AC-UX-01: Luxury feeling with Playfair Display typography and gold/teal accents",
+      "AC-GLOBAL-01: Content available in English, Swedish, and Swahili"
+    ]
+  }
+}

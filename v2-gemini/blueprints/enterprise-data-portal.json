@@ -1,0 +1,35 @@
+{
+    "tech_stack":  "nextjs",
+    "description":  "Secure B2B dashboard for large-scale data visualization and internal reporting.",
+    "category":  "web-app",
+    "blueprint_id":  "enterprise-data-portal",
+    "forced_constraints":  {
+                               "feeling":  "professional"
+                           },
+    "name":  "Enterprise Data Portal",
+    "core_modules":  [
+                         "foundation",
+                         "design-system",
+                         "auth",
+                         "dashboard",
+                         "data-management",
+                         "reports-engine",
+                         "api"
+                     ],
+    "traits":  [
+                   "data-viz",
+                   "high-security",
+                   "audit-logging"
+               ],
+    "preflight_presets":  {
+                              "acceptance_criteria":  [
+                                                          "AC-CORE-01: System must fulfill Enterprise Data Portal primary requirements AC-VALUE-01: Quality must support market price of 400000 SEK"
+                                                      ],
+                              "CRI":  {
+                                          "business_outcome":  "Secure B2B dashboard for large-scale data visualization and internal reporting.",
+                                          "target_users":  "Derived from description",
+                                          "monetization":  "Derived from category"
+                                      }
+                          },
+    "target_market_value_sek":  400000
+}

@@ -81,6 +81,7 @@ Du behöver inte köra `bridge.py` eller skapa produkt-workspace i detta steg �
 När v2-filerna finns i repot och `AUTHOR_GATE: PASS` är uppfyllt:
 
 - Öppna **`v2/improve.md`**. Det är backlogen som kopplar preflight till **schemas, validering, ingest-mappar, operator, mallar, vault, docs och git-policy** i grundrepot.
+- Kör **sanity-check** längst ner i `improve.md` först — många punkter kan redan vara åtgärdade i grundrepot; duplicera inte arbete utan att verifiera.
 - Kör den **bit för bit** (BTW) eller **planerat** efter att hela v2-lagret är mergat. Uppdatera `v2/improve.md` om ni avstår permanent från en punkt (skriv *Deferred / Won’t do* med en rad motivering).
 
 Detta steg ersätter inte `v2/claude.md`; det gör att **workspace som sätts ihop efter preflight** får en hårdare, mer automatiserbar bas.

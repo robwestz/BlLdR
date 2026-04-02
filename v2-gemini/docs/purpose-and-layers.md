@@ -1,6 +1,6 @@
 # Buildr — syfte, lager och agentförståelse
 
-> **Spegel:** samma innehåll finns under `v2/docs/purpose-and-layers.md`. Uppdatera båda vid ändringar.
+> **Spegel:** samma innehåll finns under `docs/BUILDR-purpose-and-layers.md`. Uppdatera båda vid ändringar.
 
 ## Existensberättigande (bredare än “workspace som bygger produkt”)
 
@@ -260,7 +260,7 @@ my-project/
 
 - V2-författning: `v2/start.md`
 - Grundrepo efter v2: `v2/improve.md`
-- Syfte/lager/förslag: **denna fil** (`docs/BUILDR-purpose-and-layers.md`); spegel: `v2/docs/purpose-and-layers.md`
+- Syfte/lager/förslag: `docs/BUILDR-purpose-and-layers.md` (**denna fil:** `v2/docs/purpose-and-layers.md`)
 - Prescriptive generation (Fas 1–6): se sektion ovan + `engines/forge_engine.py` (STACK_FILE_MAPS, CATEGORY_DATA_MODELS, etc.)
 - Cross-vendor: `templates/ENTRY-claude.md`, `templates/ENTRY-codex.md`, `templates/ENTRY-gemini.md`
 - Parallell exekvering: `vault/strategies/parallel-wave-execution.md`, `orchestration.yaml` → `parallel_phases`

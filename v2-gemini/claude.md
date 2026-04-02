@@ -534,6 +534,11 @@ You should mention likely future updates to at least:
 - forge/bridge integration points
 - any install/copy instructions if users load prompts/skills into local CLI environments
 
+You must include a subsection **Ground repo backlog (`v2/improve.md`)** in the Final implementation note:
+- State that `v2/improve.md` is the canonical optional roadmap for integrating preflight with the rest of the repository (schemas, validation, ingest maps, vault, docs).
+- List which backlog items (by section number or name) are **already reflected** in your generated files (e.g. `integration-with-operator.md`, `architecture.md`) versus **explicitly deferred** to post-merge work.
+- If you deferred everything, say so in one explicit sentence — do not omit the subsection.
+
 # Output Format
 
 Return your answer in this exact order:

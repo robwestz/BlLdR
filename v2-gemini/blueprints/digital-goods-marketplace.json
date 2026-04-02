@@ -1,0 +1,34 @@
+{
+    "tech_stack":  "nextjs",
+    "description":  "Marketplace for software, licenses, or design files with automated digital delivery.",
+    "category":  "e-commerce",
+    "blueprint_id":  "digital-goods-marketplace",
+    "forced_constraints":  {
+                               "feeling":  "professional"
+                           },
+    "name":  "Digital Goods Marketplace",
+    "core_modules":  [
+                         "foundation",
+                         "design-system",
+                         "product-catalog",
+                         "payment",
+                         "auth",
+                         "digital-delivery-system"
+                     ],
+    "traits":  [
+                   "digital-delivery",
+                   "payment",
+                   "auth"
+               ],
+    "preflight_presets":  {
+                              "acceptance_criteria":  [
+                                                          "AC-CORE-01: System must fulfill Digital Goods Marketplace primary requirements AC-VALUE-01: Quality must support market price of 260000 SEK"
+                                                      ],
+                              "CRI":  {
+                                          "business_outcome":  "Marketplace for software, licenses, or design files with automated digital delivery.",
+                                          "target_users":  "Derived from description",
+                                          "monetization":  "Derived from category"
+                                      }
+                          },
+    "target_market_value_sek":  260000
+}

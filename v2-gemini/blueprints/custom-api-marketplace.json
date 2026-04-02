@@ -1,0 +1,33 @@
+{
+    "tech_stack":  "nextjs",
+    "description":  "Monetize custom algorithms or data through secure API keys and usage-based billing.",
+    "category":  "api",
+    "blueprint_id":  "custom-api-marketplace",
+    "forced_constraints":  {
+                               "feeling":  "professional"
+                           },
+    "name":  "Custom API Marketplace",
+    "core_modules":  [
+                         "foundation",
+                         "api",
+                         "auth",
+                         "saas-billing",
+                         "dashboard"
+                     ],
+    "traits":  [
+                   "api-monetization",
+                   "usage-billing",
+                   "auth"
+               ],
+    "preflight_presets":  {
+                              "acceptance_criteria":  [
+                                                          "AC-CORE-01: System must fulfill Custom API Marketplace primary requirements AC-VALUE-01: Quality must support market price of 380000 SEK"
+                                                      ],
+                              "CRI":  {
+                                          "business_outcome":  "Monetize custom algorithms or data through secure API keys and usage-based billing.",
+                                          "target_users":  "Derived from description",
+                                          "monetization":  "Derived from category"
+                                      }
+                          },
+    "target_market_value_sek":  380000
+}

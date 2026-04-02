@@ -1,0 +1,35 @@
+{
+    "tech_stack":  "nextjs",
+    "description":  "Client portal for service agencies with booking, invoicing, and project history.",
+    "category":  "web-app",
+    "blueprint_id":  "automated-agency-hub",
+    "forced_constraints":  {
+                               "feeling":  "professional"
+                           },
+    "name":  "Automated Agency Hub",
+    "core_modules":  [
+                         "foundation",
+                         "design-system",
+                         "auth",
+                         "booking-calendar",
+                         "payment",
+                         "dashboard",
+                         "whatsapp"
+                     ],
+    "traits":  [
+                   "client-portal",
+                   "booking",
+                   "invoicing"
+               ],
+    "preflight_presets":  {
+                              "acceptance_criteria":  [
+                                                          "AC-CORE-01: System must fulfill Automated Agency Hub primary requirements AC-VALUE-01: Quality must support market price of 220000 SEK"
+                                                      ],
+                              "CRI":  {
+                                          "business_outcome":  "Client portal for service agencies with booking, invoicing, and project history.",
+                                          "target_users":  "Derived from description",
+                                          "monetization":  "Derived from category"
+                                      }
+                          },
+    "target_market_value_sek":  220000
+}

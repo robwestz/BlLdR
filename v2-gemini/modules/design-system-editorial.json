@@ -1,0 +1,39 @@
+{
+  "id": "design-system-editorial",
+  "name": "Design System Editorial (Source/Outfit/Gold)",
+  "priority": "foundation",
+  "order": 2,
+  "description": "High-fidelity editorial design system focusing on typography, whitespace, and premium color palettes.",
+  "tech_tokens": {
+    "colors": {
+      "background": "#F7F5F0",
+      "sidebar": "#1B1B2F",
+      "accent": "#D4A853",
+      "text-primary": "#1A1A1A",
+      "text-secondary": "#4A4A4A",
+      "surface": "#FFFFFF",
+      "border": "#E5E1D8"
+    },
+    "typography": {
+      "heading": "Source Serif 4, serif",
+      "body": "Outfit, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "spacing": {
+      "unit": "0.25rem",
+      "container-max": "1440px"
+    }
+  },
+  "components": [
+    "PremiumHeader: Sticky with blur, gold accent border",
+    "EditorialCard: Subtle shadow, Source Serif headings, high-contrast text",
+    "BentoGrid: Layout for dashboards/portals",
+    "GoldButton: Outfit typography, subtle gold gradient, smooth hover",
+    "SidebarNav: Dark #1B1B2F theme with Outfit labels and Source Serif active state"
+  ],
+  "acceptance_criteria": [
+    "AC-ED-01: Typography scale is perfectly legible and follows editorial standards",
+    "AC-ED-02: Color palette uses #F7F5F0 as base with #D4A853 as high-impact accent",
+    "AC-ED-03: Responsive behavior maintains white-space and luxury feel at all breakpoints"
+  ]
+}

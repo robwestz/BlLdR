@@ -1,0 +1,33 @@
+{
+    "tech_stack":  "nextjs",
+    "description":  "Agency reseller dashboard with multi-tenant support and editorial design.",
+    "category":  "web-app",
+    "blueprint_id":  "white-label-client-dash",
+    "forced_constraints":  {
+                               "feeling":  "professional"
+                           },
+    "name":  "White-Label Client Dash",
+    "core_modules":  [
+                         "foundation",
+                         "design-system-editorial",
+                         "auth",
+                         "dashboard",
+                         "team-management"
+                     ],
+    "traits":  [
+                   "white-label",
+                   "multi-tenant",
+                   "editorial-design"
+               ],
+    "preflight_presets":  {
+                              "acceptance_criteria":  [
+                                                          "AC-CORE-01: System must fulfill White-Label Client Dash primary requirements AC-VALUE-01: Quality must support market price of 270000 SEK"
+                                                      ],
+                              "CRI":  {
+                                          "business_outcome":  "Agency reseller dashboard with multi-tenant support and editorial design.",
+                                          "target_users":  "Derived from description",
+                                          "monetization":  "Derived from category"
+                                      }
+                          },
+    "target_market_value_sek":  270000
+}

@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "description": "Mapping between Gemini Blueprints/Traits and Buildr Ground-Repo Components (Catalog/Vault/Engines).",
+  "trait_bindings": {
+    "design-system-editorial": {
+      "catalog_id": "ui-ux-pro-max-skill",
+      "vault_items": ["vault/skills/implementation-playbook.md"],
+      "engine_config": {
+        "feeling": "luxury",
+        "typography": "Source Serif 4 / Outfit"
+      },
+      "ac_ids": ["AC-ED-01", "AC-ED-02", "AC-ED-03"]
+    },
+    "memory-visualizer": {
+      "catalog_id": "retrospective-builder",
+      "vault_items": ["vault/skills/memory-consolidation.md"],
+      "engine_config": {
+        "needs_database": true,
+        "has_api": true
+      },
+      "ac_ids": ["AC-COGNITION-01", "AC-COGNITION-02"]
+    },
+    "identity-guardian": {
+      "catalog_id": "agent-rules",
+      "vault_items": ["vault/routines/preflight-gate-check.md"],
+      "engine_config": {
+        "has_auth": true
+      },
+      "ac_ids": ["AC-IDENTITY-01"]
+    },
+    "saas-billing": {
+      "catalog_id": "pipeline-composer",
+      "vault_items": ["vault/strategies/parallel-wave-execution.md"],
+      "engine_config": {
+        "has_payment": true,
+        "needs_api": true
+      },
+      "ac_ids": ["AC-PAYMENT-01", "AC-BILLING-01"]
+    }
+  },
+  "blueprint_anchors": {
+    "ultima-claw-ui-prime": {
+      "category": "web-app",
+      "tech_stack": "nextjs",
+      "required_traits": ["design-system-editorial", "memory-visualizer", "identity-guardian"],
+      "vault_context": "vault/strategies/blueprint-mixer.md"
+    },
+    "zanzibar-premium-booking": {
+      "category": "booking",
+      "tech_stack": "nextjs",
+      "required_traits": ["design-system-editorial", "saas-billing"],
+      "vault_context": "vault/strategies/parallel-wave-execution.md"
+    }
+  }
+}
